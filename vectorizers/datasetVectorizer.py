@@ -1,15 +1,15 @@
 import pandas as pd
 from os import listdir
 
-import docVecs
-from cleaner import clean_text
+import vectorizers.docVecs
+from utils.cleaner import clean_text
 
 def vec_to_dict(docVec):
     """ Converts docVec to dict mapping dimension names to values """
     return {dimension:value for dimension, value in enumerate(docVec)}
 
 
-def vectorize_folderPath(folderPath, cleanFiles=True, outPath=""):
+def vectorize_folderPath(folderPath, cleanFiles=False, outPath=""):
     """
     Vectorizes each file under folderPath and returns dataframe
         -folderPath: the path to the folder in which the files are stored
@@ -39,12 +39,12 @@ def vectorize_folderPath(folderPath, cleanFiles=True, outPath=""):
     return dataframe
 
 
-def vectorize_csv(filePath, delimiter=',', cleanFiles=True, outPath=""):
+def vectorize_csv(filePath, delimiter=',', cleanFiles=False, outPath=""):
     """
     Builds a dataframe of vectors from csv where lines have form:
     'title DELIMITER text'.
         -filePath: path the the csv file to analyze
-        -delimited: the delimiter used to separate title and text
+        -delimiter: the delimiter used to separate title and text
         -cleanFiles: true if the file text should be cleaned before vectorization
         -outPath: location at which to save the dataframe
     """
@@ -62,6 +62,19 @@ def vectorize_csv(filePath, delimiter=',', cleanFiles=True, outPath=""):
             print(f'Building dataframe: {i}', end='\r')
     # build dataframe from text vectors
     dataframe = pd.DataFrame(fileList)
+    # save to outPath if prompted
     if not (outPath==""):
         dataframe.to_pickle(outPath)
     return dataframe
+
+
+def vectorize_folderDict(folderList, cleanFiles=False, outPath=""):
+    """
+    Vectorizes list of folder paths, creating a dataframe that stores vectors
+    and their file and folder
+        -folderList: iterable of paths to folders to anaylyze
+        -cleanFiles: true if the file text should be cleaned before vectorization
+        -outPath: location at which to save the dataframe
+    """
+    for folderPath in folderList:
+        folderDF = vectorize_folderPath(folderPath)

@@ -2,7 +2,7 @@ import re
 import numpy as np
 from scipy.spatial.distance import euclidean
 
-import docVecs
+import vectorizers.docVecs as docVecs
 
 binopList = ['+', '-', '?', '==']
 unopList = ['(', ')']

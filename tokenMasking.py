@@ -5,7 +5,7 @@ from flashtext import KeywordProcessor
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 
-import docVecs
+import vectorizers.docVecs as docVecs
 
 
 def build_keyword_processor(knowledgeSet):
