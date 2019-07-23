@@ -28,7 +28,7 @@ def train_folder_model(inPath, testFraction=0.1, epochs=10, outPath=None):
 
     # normalize z-score of vecDf dimensions
     normalizedVecDf = pd.DataFrame(StandardScaler().fit_transform(X=vecDf))
-    print(f'Normalized Dataframe Head:\n{normalizedVecDf.describe().head()}')
+    print(f'Normalized Dataframe Head:\n{normalizedVecDf.describe()}')
 
     # one-hot encode targets
     targetDict = {target:i for i, target in enumerate(set(rawTargets))}
@@ -36,7 +36,7 @@ def train_folder_model(inPath, testFraction=0.1, epochs=10, outPath=None):
     encodedTargets = to_categorical(numericTargets)
 
     # train_test_split the data
-    x_train, y_train, x_test, y_test = train_test_split(normalizedVecDf,
+    x_train, x_test, y_train, y_test = train_test_split(normalizedVecDf,
                                                         encodedTargets,
                                                         test_size=testFraction)
 
@@ -45,7 +45,7 @@ def train_folder_model(inPath, testFraction=0.1, epochs=10, outPath=None):
     model.add(Dense(100, activation='relu', input_dim=((x_train.shape)[1])))
     model.add(Dense(100, activation='relu', kernel_regularizer=l2(0.01)))
     # binary output layer with sigmoid activation
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(2, activation='sigmoid'))
     # compile the model
     model.compile(loss='binary_crossentropy',
                     optimizer='adam',
@@ -57,7 +57,7 @@ def train_folder_model(inPath, testFraction=0.1, epochs=10, outPath=None):
     if (testFraction != 0):
         modelMetrics = model.evaluate(x_test, y_test)
         print('Evaluation:')
-        for i, metric in (model.metrics_names):
+        for i, metric in enumerate(model.metrics_names):
             print(f'\t{metric}: {modelMetrics[i]}')
 
     # save model if outPath is given

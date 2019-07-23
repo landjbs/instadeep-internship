@@ -91,6 +91,6 @@ def vectorize_folderList(folderList, numFiles, cleanFiles=False, outPath=None):
 
     multiFolderDf = pd.concat(vectorize_folder_with_name(folderPath)
                                 for folderPath in folderList)
-    if not outPath:
+    if outPath:
         multiFolderDf.to_pickle(outPath)
     return multiFolderDf
