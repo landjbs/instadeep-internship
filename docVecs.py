@@ -25,7 +25,7 @@ def vectorize_sentence_split(document, sentenceDelimiters=['!', '.', '?']):
     # build matcher
     if not (sentenceDelimiters==['!','.','?']):
         sentenceMatcher = re.compile(f"[{'|'.join(delimiter for delimiter in sentenceDelimiters)}]")
-    # tokenize sentences
+    # tokenize sentences and remove empty sentences
     splitDoc = [sentence for sentence in re.split(sentenceMatcher, document)
                 if not (sentence=="")]
     return bc.encode(splitDoc)
@@ -60,11 +60,3 @@ def vectorize_n_split(document, n):
     # create matrix of vectorized chunks
     docMatrix = np.array([vectorize_doc(chunk) for chunk in chunkMatrix])
     return docMatrix
-
-
-### Helpers ###
-def docVec_to_dict(docVec):
-    """
-    Converts docVec to dict mapping dimension name to value for df building
-    """
-    return {dimension:value for dimension, value in enumerate(docVec)}
