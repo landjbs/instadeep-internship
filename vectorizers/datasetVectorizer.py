@@ -1,7 +1,7 @@
 import pandas as pd
 from os import listdir
 
-import vectorizers.docVecs
+import vectorizers.docVecs as docVecs
 from utils.cleaner import clean_text
 
 def vec_to_dict(docVec):
@@ -68,7 +68,7 @@ def vectorize_csv(filePath, delimiter=',', cleanFiles=False, outPath=""):
     return dataframe
 
 
-def vectorize_folderDict(folderList, cleanFiles=False, outPath=""):
+def vectorize_folderList(folderList, cleanFiles=False, outPath=""):
     """
     Vectorizes list of folder paths, creating a dataframe that stores vectors
     and their file and folder
@@ -76,5 +76,15 @@ def vectorize_folderDict(folderList, cleanFiles=False, outPath=""):
         -cleanFiles: true if the file text should be cleaned before vectorization
         -outPath: location at which to save the dataframe
     """
-    for folderPath in folderList:
-        folderDF = vectorize_folderPath(folderPath)
+
+    def vectorize_folder_with_name(folderPath):
+        """ Helper wraps vectorize_folderPath with additional 'folder' column """
+        folderDf = vectorize_folderPath(folderPath, cleanFiles=cleanFiles)
+        folderDf['folder'] = folderPath
+        return folderDf
+
+    multiFolderDf = pd.concat(vectorize_folder_with_name(folderPath)
+                                for folderPath in folderList)
+    if not (outPath==""):
+        multiFolderDf.to_pickle(outPath)
+    return multiFolderDf
