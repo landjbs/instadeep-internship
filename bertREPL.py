@@ -1,7 +1,5 @@
 import re
 import numpy as np
-import matplotlib.pyplot as plt
-from termcolor import colored
 from scipy.spatial.distance import euclidean
 
 import docVecs
@@ -9,6 +7,7 @@ import docVecs
 binopList = ['+', '-', '?', '==']
 unopList = ['(', ')']
 unopMatcher = re.compile(r'[(|)]')
+
 
 def bert_parser(inStr):
     tokens = inStr.split()
@@ -32,6 +31,7 @@ def bert_parser(inStr):
             print(token1, token2, operator)
             print(bert_binop(token1, token2, operator))
 
+
 def find_subs(inStr):
     numOpen = 0
     subsList = []
@@ -52,10 +52,6 @@ def find_subs(inStr):
 
 
 def bert_multiParser(inStr):
-    # words = re.findall(r'(?<=\()[^)]+(?=\))', inStr)
-    # expressions = re.findall(r'(?<=\().+(?=\))', inStr)
-    # for expression in expressions:
-    #     # words = expression.split()
     expression = re.findall(r'(?<=\().+(?=\))', inStr)
     subExpressions = find_subs(expression[0])
     if len(subExpressions)==1:
@@ -67,20 +63,6 @@ def bert_multiParser(inStr):
         rightStart = expression[0].find(subExpressions[1])
         operator = re.findall(r'[?|==|\-|\+]', expression[0][leftEnd:rightStart])
         return bert_binop(left, right, operator[0])
-
-    # if len(subExpressions)==1:
-    #     print(subExpressions)
-    #     return docVecs.vectorize_doc(subExpressions[0])
-    # elif len(subExpressions)==3:
-    #     operator = subExpressions[1]
-    #     parsedFirst = bert_multiParser(subExpressions[0])
-    #     parsedLast = bert_multiParser(subExpressions[2])
-    #     return bert_binop(parsedFirst, parsedLast, operator)
-
-
-# def bert_unop(vec1, operator):
-#     """ Performs unary operation from unopList on vec1 """
-#
 
 
 def bert_binop(vec1, vec2, operator):
@@ -96,6 +78,7 @@ def bert_binop(vec1, vec2, operator):
         return (vec1 == vec2)
     else:
         raise ValueError(f"Invalid operator '{operator}'")
+
 
 def bert_arthimetic(inStr):
     """ inStr must have form 'TERM_1 [+|-] TERM_2 '"""

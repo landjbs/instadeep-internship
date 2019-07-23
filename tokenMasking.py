@@ -1,19 +1,30 @@
 import re
 import numpy as np
-import matplotlib.pyplot as plt
 from termcolor import colored
+from flashtext import KeywordProcessor
+import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 
 import docVecs
 
 
-def vectorize_masked_tokens(document, maskToken='', knowledgeProcessor=None, scoringMethod='euclidean', disp=False):
+def build_keyword_processor(knowledgeSet):
+    """ Builds flashtext matcher for words in knowledgeSet iterable """
+    # initialize flashtext KeywordProcessor
+    keywordProcessor = KeywordProcessor(case_sensitive=False)
+    for i, keyword in enumerate(knowledgeSet):
+        print(f"\tBuilding keywordProcessor: {i}", end="\r")
+        keywordProcessor.add_keyword(keyword)
+    print("\keywordProcessor Built")
+    return keywordProcessor
+
+
+def vectorize_masked_tokens(document, maskToken='', keywordProcessor=None, scoringMethod='euclidean', disp=False):
     """
     Iteratively masks all knowledge tokens in document string and determines
     score relative to initial vector. Returns dict of token and score
         -document: string of the document to vectorize
         -maskToken: string to replace each token with
-        -knowledgeProcessor: knowledge tokens to locate, will be built from document if not given
         -scoringMethod: use euclidean distance or dot product to determine distance from baseVec
         -disp: whether to display the bar chat of distances
     """
@@ -22,8 +33,8 @@ def vectorize_masked_tokens(document, maskToken='', knowledgeProcessor=None, sco
     assert isinstance(maskToken, str), "maskToken must have type 'str'"
     assert (scoringMethod in ['euclidean', 'dot']), "scoringMethod must be 'euclidean' or 'dot'"
 
-    if not knowledgeProcessor:
-        knowledgeProcessor = build_knowledgeProcessor(document.split())
+    if not keywordProcessor:
+        keywordProcessor = build_keyword_processor(document.split())
 
     # define scoring method
     if (scoringMethod=='euclidean'):
@@ -37,7 +48,7 @@ def vectorize_masked_tokens(document, maskToken='', knowledgeProcessor=None, sco
     baseVec = docVecs.vectorize_doc(document)
 
     # find tokens in document with both greedy and non-greedy matching
-    foundTokens = find_rawTokens(document, knowledgeProcessor)
+    foundTokens = set(keywordProcessor.extract_keywords(document))
 
     scoreDict = {}
 
@@ -56,3 +67,7 @@ def vectorize_masked_tokens(document, maskToken='', knowledgeProcessor=None, sco
         plt.show()
 
     return scoreDict
+
+while True:
+    x = input(" : ")
+    print(vectorize_masked_tokens(x))
