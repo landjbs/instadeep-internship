@@ -67,7 +67,3 @@ def vectorize_masked_tokens(document, maskToken='', keywordProcessor=None, scori
         plt.show()
 
     return scoreDict
-
-while True:
-    x = input(" : ")
-    print(vectorize_masked_tokens(x))

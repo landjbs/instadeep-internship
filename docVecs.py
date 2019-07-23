@@ -22,12 +22,12 @@ def vectorize_doc(document):
 
 def vectorize_sentence_split(document, sentenceDelimiters=['!', '.', '?']):
     """ Vectorizes document as list of sentences; returns list of vectors """
-    # build matcher and tokenize sentences
-    if not sentenceDelimiters==['!','.','?']:
-        sentenceMatcher = re.compile('[' + '|'.join(delimiter for delimiter in sentenceDelimiters) + ']')
+    # build matcher
+    if not (sentenceDelimiters==['!','.','?']):
+        sentenceMatcher = re.compile(f"[{'|'.join(delimiter for delimiter in sentenceDelimiters)}]")
+    # tokenize sentences
     splitDoc = [sentence for sentence in re.split(sentenceMatcher, document)
                 if not (sentence=="")]
-    print(splitDoc)
     return bc.encode(splitDoc)
 
 
