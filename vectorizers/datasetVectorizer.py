@@ -25,8 +25,8 @@ def vectorize_folderPath(folderPath, cleanFiles=False, outPath=""):
             # vectorize text and convert vector to dict
             fileVector = docVecs.vectorize_doc(text)
             fileDict = vec_to_dict(fileVector)
-            # add filename to the dict and return
-            fileDict.update({'fileName':file})
+            # add file name to the dict and return
+            fileDict.update({'file':file})
             return fileDict
 
     # build list of fileDicts from files under folderPath
@@ -57,7 +57,7 @@ def vectorize_csv(filePath, delimiter=',', cleanFiles=False, outPath=""):
             cleanText = clean_text(rawText) if cleanFiles else rawText
             textVector = docVecs.vectorize_doc(cleanText)
             textDict = vec_to_dict(textVector)
-            textDict.update({'fileName':title})
+            textDict.update({'file':title})
             fileList.append(textDict)
             print(f'Building dataframe: {i}', end='\r')
     # build dataframe from text vectors
