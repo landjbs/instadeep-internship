@@ -11,7 +11,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.regularizers import l2
 
-def train_folder_model(inPath, testFraction=0.7, epochs=10, outPath=""):
+def train_folder_model(inPath, testFraction=0.1, epochs=10, outPath=None):
     """
         -inPath:        Path at which dataframe has been pickled
         -testFraction:  The fraction of the data that will be used for
@@ -47,6 +47,20 @@ def train_folder_model(inPath, testFraction=0.7, epochs=10, outPath=""):
     # binary output layer with sigmoid activation
     model.add(Dense(1, activation='sigmoid'))
     # compile the model
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy',
+                    optimizer='adam',
+                    metrics=['accuracy'])
     # train the model
     model.fit(x_train, y_train, epochs=epochs)
+
+    # display test metrics if test data is allocated
+    if (testFraction != 0):
+        modelMetrics = model.evaluate(x_test, y_test)
+        print('Evaluation:')
+        for i, metric in (model.metrics_names):
+            print(f'\t{metric}: {modelMetrics[i]}')
+
+    # save model if outPath is given
+    if outPath:
+        model.save(outPath)
+    return model
