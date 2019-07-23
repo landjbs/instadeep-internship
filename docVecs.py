@@ -5,28 +5,26 @@ Modularized document vectorization tools
 import re
 from math import floor
 import numpy as np
-from termcolor import colored
-import appscript
 from bert_serving.client import BertClient
-import matplotlib.pyplot as plt
 
 
 # bert-serving-start -model_dir /Users/landonsmith/Desktop/uncased_L-24_H-1024_A-16 -num_worker=1
 bc = BertClient(check_length=False)
 
+sentenceMatcher = re.compile(r'[!|.|?]')
+
+
 ### Vectorization Methods ###
 def vectorize_doc(document):
-    """
-    Vectorizes entire document in single 1024 dim vector using BertClient
-    """
-    # return document vector for tokenized input doc
+    """ Vectorizes entire document to 1024 dimensions using BertClient """
     return bc.encode([document])[0]
 
 
 def vectorize_sentence_split(document, sentenceDelimiters=['!', '.', '?']):
     """ Vectorizes document as list of sentences; returns list of vectors """
     # build matcher and tokenize sentences
-    sentenceMatcher = re.compile('[' + '|'.join(delimiter for delimiter in sentenceDelimiters) + ']')
+    if not sentenceDelimiters==['!','.','?']:
+        sentenceMatcher = re.compile('[' + '|'.join(delimiter for delimiter in sentenceDelimiters) + ']')
     splitDoc = [sentence for sentence in re.split(sentenceMatcher, document)
                 if not (sentence=="")]
     print(splitDoc)
