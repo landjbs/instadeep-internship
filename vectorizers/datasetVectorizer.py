@@ -72,9 +72,10 @@ def vectorize_folderList(folderList, cleanFiles=False, outPath=""):
     """
     Vectorizes list of folder paths, creating a dataframe that stores vectors
     and their file and folder
-        -folderList: iterable of paths to folders to anaylyze
-        -cleanFiles: true if the file text should be cleaned before vectorization
-        -outPath: location at which to save the dataframe
+        -folderList:    Iterable of paths to folders to anaylyze.
+        -cleanFiles:    True if the file text should be cleaned
+                            before vectorization.
+        -outPath:       Location at which to save the dataframe.
     """
 
     def vectorize_folder_with_name(folderPath):
