@@ -60,7 +60,7 @@ def read_question_dataset(path):
                     longAnswerStarts = [candidate['start_token']
                                         for candidate in longAnswerCandidates]
                     if divDict['text']=="": print(questionDict['document_html'])
-
+    #test
     # scrape files in
     infoList = [scrape_wiki_file(file) for file in listdir(path)]
     dataframe = pd.DataFrame(infoList)
