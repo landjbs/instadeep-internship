@@ -21,18 +21,18 @@ pMatcher = re.compile('^P')
 
 
 def clean_wiki_html(rawHTML):
-    """ Helper to convert raw wiki html to a clean div dict """
+    """
+    Helper to convert raw wiki html to tuple of cleaned title and cleaned text
+    """
     # create soup object for the html string
     soupObj = BeautifulSoup(rawHTML, 'html.parser')
     # find title
     title = soupObj.title.text
     # find raw text of page
-    # rawText = " ".join(str(p) for p in soupObj.find_all(pMatcher))
-    rawText = " ".join(re.findall(r'(?<=<P>)[^</P>]+(?=</P>)',
+    rawText = " ".join(re.findall(r'(?<=<P>)[^$]+(?=</P>)',
                                     string=rawHTML,
                                     flags=re.IGNORECASE))
-    return {'title':title,
-                'text': clean_web_text(rawText)}
+    return clean_text(title), clean_text(rawText)
 
 
 def read_question_dataset(path):
@@ -48,19 +48,20 @@ def read_question_dataset(path):
                 for i, questionDict in enumerate(json_lines.reader(questionFile)):
                     # get question text and vectorize
                     questionText = questionDict['question_text']
-                    # questionVec = docVecs.vectorize_doc(questionText)
+                    questionVec = docVecs.vectorize_doc(questionText)
 
                     # get dict of page divisions and vectorize
                     divDict = clean_wiki_html(questionDict['document_html'])
-                    # divVecs = {divName:(docVecs.vectorize_doc(divText))
-                    #             for divName, divText in divDict.items()}
+                    divVecs = {divName:(docVecs.vectorize_doc(divText))
+                                for divName, divText in divDict.items()}
 
                     # get list of start locations for each long answer candidate
                     longAnswerCandidates = questionDict['long_answer_candidates']
                     longAnswerStarts = [candidate['start_token']
                                         for candidate in longAnswerCandidates]
-                    if divDict['text']=="": print(questionDict['document_html'])
-    #test
+
+                    columnDict = {}
+
     # scrape files in
     infoList = [scrape_wiki_file(file) for file in listdir(path)]
     dataframe = pd.DataFrame(infoList)
