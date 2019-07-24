@@ -33,7 +33,7 @@ def vectorize_folderPath(folderPath, numFiles, cleanFiles=False, outPath=None):
 
     # build list of fileDicts from files under folderPath
     fileList = [build_file_dict(file, i)
-                for i, file in enumerate(listdir(folderPath)) if (i < numFiles)]
+                for i, file in enumerate(listdir(folderPath)[:numFiles])]
     # convert list to dataframe
     dataframe = pd.DataFrame(fileList)
     # save dataframe if prompted

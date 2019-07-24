@@ -2,3 +2,6 @@
 *.vocab
 *.feat
 *.sav
+*.gstmp
+*.gz
+*.jsonl

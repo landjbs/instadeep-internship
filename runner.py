@@ -1,7 +1,12 @@
-from vectorizers.datasetVectorizer import vectorize_folderList
+# from vectorizers.datasetVectorizer import vectorize_folderList
+# folderList = ['data/inData/imdbData/train/pos', 'data/inData/imdbData/train/neg']
+# vectorize_folderList(folderList, numFiles=5000, outPath='data/outData/imdbTrain5000.sav')
+
 # from supervised.folderPrediction import train_folder_model
+# train_folder_model('data/outData/imdbTrain5000.sav', outPath='data/outData/models/folderModel5000.sav')
 
-folderList = ['data/inData/imdbData/test/neg', 'data/inData/imdbData/test/pos']
-vectorize_folderList(folderList, numFiles=1000, cleanFiles=False, outPath="data/outData/imdbTrain.sav")
+from supervised.sentimentAnalyzer import analyze_text
 
-# train_folder_model(inPath='data/outData/imdbTrain.sav', outPath='data/outData/models/imdbModel_Small.sav')
+while True:
+    text = input('test: ')
+    analyze_text(text)
