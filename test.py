@@ -4,14 +4,11 @@
 # from vectorizers.docVecs import vectorize_doc
 # from utils.cleaner import clean_text
 
-# from documentRetrieval.questionReading import read_question_dataset
-# PATH = 'data/inData/natural_questions/v1.0/train'
-# read_question_dataset(PATH, n=1, outPath='test')
 
-import pandas as pd
-df = pd.read_pickle('test')
-print(df)
-
+from documentRetrieval.questionReading import read_question_dataset
+PATH = 'data/inData/natural_questions/v1.0/train'
+x = read_question_dataset(PATH, n=1000, outPath='data/outData/questionsDf1000.sav')
+print(x)
 # nounSet = set()
 # with open('data/inData/nouns.txt', 'r') as nounFile:
 #     for line in nounFile:

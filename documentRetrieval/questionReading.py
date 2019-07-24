@@ -6,6 +6,7 @@ map of questions and their vectors to wikipedia articles and their vectors.
 import re
 import json_lines
 import pandas as pd
+from time import time
 from os import listdir
 from bs4 import BeautifulSoup
 from termcolor import colored
@@ -40,51 +41,69 @@ def clean_wiki_html(rawHTML):
 def read_question_dataset(path, n, outPath=None):
     """
     Reads Google Natural Questions dataset into dataframe
-        -path:  the path to the folder containing jsonl files to analyze
-        -n:     the number of questions to analyze from each file
+        -path:      The path to the folder containing jsonl files to analyze
+        -n:         The number of questions to analyze from each file
+        -outPath:   The path to which to save the dataframe
     """
-
+    startTime = time()
     def scrape_wiki_file(file):
         """ Helper pulls information out of wiki file and returns dict """
-        if file.endswith('.jsonl'):
+        if not file.endswith('.jsonl'):
+            print(colored(f'WARNING: Cannot analyze "{file}"', 'red'))
+        else:
             print(colored(f'Analyzing: "{file}"', 'cyan'))
+            fileData = []
             with open(f'{path}/{file}', 'r') as questionFile:
                 for i, questionDict in enumerate(json_lines.reader(questionFile)):
                     if i >= n:
                         break
+
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
-                    # get question text and vectorize
-                    questionText = questionDict['question_text']
-                    questionVec = docVecs.vectorize_doc(questionText)
+                    try:
+                        # get question text and vectorize
+                        questionText = questionDict['question_text']
+                        questionVec = docVecs.vectorize_doc(questionText)
 
-                    # get cleaned string of title and text and vectorie
-                    title, text = clean_wiki_html(questionDict['document_html'])
-                    titleVec = docVecs.vectorize_doc(title)
-                    textVec = docVecs.vectorize_doc(text)
+                        # get cleaned string of title and text and vectorie
+                        title, text = clean_wiki_html(questionDict['document_html'])
+                        titleVec = docVecs.vectorize_doc(title)
+                        textVec = docVecs.vectorize_doc(text)
 
-                    # get list of start locations for each long answer candidate
-                    longAnswerCandidates = questionDict['long_answer_candidates']
-                    longAnswerStarts = [candidate['start_token']
-                                        for candidate in longAnswerCandidates]
+                        # get list of start locations for each long answer candidate
+                        longAnswerCandidates = questionDict['long_answer_candidates']
+                        longAnswerStarts = [candidate['start_token']
+                                            for candidate in longAnswerCandidates]
 
-                    colDict =  {'questionText':     questionText,
-                                'questionVec':      questionVec,
-                                'titleVec':         titleVec,
-                                'textVec':          textVec,
-                                'longAnswerStarts': longAnswerStarts}
+                        # get the url of the page
+                        pageUrl = questionDict['document_url']
 
-                    return colDict
-        else:
-            print(colored(f'WARNING: Cannot analyze "{file}"', 'red'))
+                        # convert question data into dict and append to fileData list
+                        columnDict =  {'pageUrl':           pageUrl,
+                                        'questionText':     questionText,
+                                        'questionVec':      questionVec,
+                                        'titleVec':         titleVec,
+                                        'textVec':          textVec,
+                                        'longAnswerStarts': longAnswerStarts}
+                        # yield columnDict
+                        fileData.append(columnDict)
 
-    # scrape files under path and filter out None
-    infoList = [scrape_wiki_file(file) for file in listdir(path)]
-    filteredList = list(filter(lambda elt:(elt!=None), infoList))
+                    except Exception as e:
+                        print(colored(f'\tException: {e}', 'red'))
 
-    dataframe = pd.DataFrame(filteredList)
+                return fileData
+
+    # scrape files under path and filter out instances of None
+    infoList = []
+    for file in listdir(path):
+        scrapeList = scrape_wiki_file(file)
+        if scrapeList:
+            infoList += scrapeList
+
+    dataframe = pd.DataFrame(infoList)
 
     # save to outPath if give
     if outPath:
         dataframe.to_pickle(outPath)
 
+    print(f'{len(infoList)} questions analyzed in {time()-startTime} seconds.')
     return dataframe
