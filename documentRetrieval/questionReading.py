@@ -32,7 +32,7 @@ def clean_wiki_html(rawHTML):
     # find title
     title = soupObj.title.text
     # find raw text of page
-    rawText = " ".join(re.findall(r'(?<=<P>)[^$](?=</P>)',
+    rawText = " ".join(re.findall(r'(?<=<P>)[^$]+(?=</P>)',
                                     string=rawHTML,
                                     flags=re.IGNORECASE))
     return clean_text(title), clean_text(rawText)
@@ -57,7 +57,6 @@ def read_question_dataset(path, n, outPath=None):
                 for i, questionDict in enumerate(json_lines.reader(questionFile)):
                     if i >= n:
                         break
-
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
                     try:
                         # get question text and vectorize

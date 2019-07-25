@@ -5,27 +5,19 @@
 # from utils.cleaner import clean_text
 
 
-from documentRetrieval.questionReading import read_question_dataset
-PATH = 'data/inData/natural_questions/v1.0/train'
-x = read_question_dataset(PATH, n=1000, outPath='data/outData/questionsDf1000.sav')
-print(x)
-# nounSet = set()
-# with open('data/inData/nouns.txt', 'r') as nounFile:
-#     for line in nounFile:
-#         nounSet.add(clean_text(line))
-# cluster = ProjectableCluster(nounSet, outPath='data/outData/ProjectableCluster.sav')
+# from documentRetrieval.questionReading import read_question_dataset
+# PATH = 'data/inData/natural_questions/v1.0/train'
+# x = read_question_dataset(PATH, n=2500, outPath='data/outData/questionsDf2500.sav')
 
-# cluster = ProjectableCluster(inPath='data/outData/ProjectableCluster.sav')
-# import os
-# textList = []
-# path = 'data/inData/imdbData/train/pos'
-# for i, file in enumerate(os.listdir(path)[:500]):
-#     with open(f'{path}/{file}', 'r') as imdbFile:
-#         textList.append(imdbFile.read())
-#
-# cluster = ProjectableCluster(textList, outPath='data/outData/imdbCluster.sav')
 
-# while True:
-#     search = input("Search: ")
-#     newVec = vectorize_doc(search)
-#     print(cluster.find_nearest_via_centroid(newVec, n=5))
+# from documentRetrieval.modelTraining import train_retrieval_model
+# retrievalModel = train_retrieval_model(inPath='data/outData/questionsDf2500.sav',
+#                                         numWrong=3,
+#                                         outPath='data/outData/models/documentRetrievalModel2500.sav')
+
+from documentRetrieval.retreiverAPI import Retreiver
+wikiSearcher = Retreiver('data/inData/wikipedia_utf8_filtered_20pageviews.csv', n=10)
+
+while True:
+    search = input("Search: ")
+    wikiSearcher.retreive(search)

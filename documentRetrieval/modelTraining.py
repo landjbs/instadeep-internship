@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-def train_retrieval_model(inPath, numWrong, outPath=None):
+def train_retrieval_model(inPath, numWrong=3, outPath=None):
     ### import and modify dataframe ###
     questionsDf = pd.read_pickle(inPath)
     questionsDf = questionsDf.drop(columns=['longAnswerStarts'])
