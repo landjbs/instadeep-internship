@@ -16,8 +16,11 @@
 #                                         outPath='data/outData/models/documentRetrievalModel2500.sav')
 
 from documentRetrieval.retreiverAPI import Retreiver
-wikiSearcher = Retreiver('data/inData/wikipedia_utf8_filtered_20pageviews.csv', n=10)
-
+wikiSearcher = Retreiver('data/inData/wikipedia_utf8_filtered_20pageviews.csv', n=200, sep="  ")
+wikiSearcher.display_titles()
 while True:
     search = input("Search: ")
-    wikiSearcher.retreive(search)
+    resultList = wikiSearcher.retrieve(search, n=5, cutoff=12)
+    print('Results:')
+    for result in resultList:
+        print(f'\t{result}')

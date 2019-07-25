@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from math import inf
 from keras.models import load_model
 from scipy.spatial.distance import euclidean
@@ -20,7 +22,7 @@ class Retreiver():
             for i, line in enumerate(documentsFile):
                 if i > n:
                     break
-                print(f'Reading File: {i}')
+                print(f'Reading File: {i}', end='\r')
                 sepLoc = line.find(sep)
                 title = line[:sepLoc]
                 text = line[sepLoc:]
@@ -43,13 +45,20 @@ class Retreiver():
 
         scoresList = []
 
-        for docTitle, docVec in (self.documents).iteritems():
+        counterList = ['-', '/', '+', '\\', '+', '|']
+        counterLen = len(counterList)
+        counter = 0
+        for docTitle, docVec in (self.documents).items():
             docDist = euclidean(questionVec, docVec)
-            if docDist < cutoff:
-                distDict = vec_to_dict(docDist)
-                distDf = pd.DataFrame(distDict)
-                prediction = self.model.predict(distDf)
-                print(f'{docTitle}: {prediction}')
-                scoresList.append((prediction, docTitle))
+            scoresList.append(((1/docDict), docTitle))
+            # if docDist < cutoff:
+            #     docDiff = np.subtract(questionVec, docVec)
+            #     diffDict = datasetVectorizer.vec_to_dict(docDiff)
+            #     diffDf = pd.DataFrame([diffDict])
+            #     prediction = self.model.predict(diffDf)[0]
+            #     if prediction > 0.6:
+            #         scoresList.append((prediction, docTitle))
+            # print(f'\tSearching: {counterList[counter%counterLen]}', end='\r')
+            # counter += 1
         scoresList.sort(reverse=True)
         return [scoreTuple[1] for scoreTuple in scoresList[:n]]
