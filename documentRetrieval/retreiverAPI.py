@@ -50,7 +50,7 @@ class Retreiver():
         counter = 0
         for docTitle, docVec in (self.documents).items():
             docDist = euclidean(questionVec, docVec)
-            scoresList.append(((1/docDict), docTitle))
+            scoresList.append(((1/docDist), docTitle))
             # if docDist < cutoff:
             #     docDiff = np.subtract(questionVec, docVec)
             #     diffDict = datasetVectorizer.vec_to_dict(docDiff)
