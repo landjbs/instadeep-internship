@@ -51,14 +51,14 @@ class Retreiver():
         for docTitle, docVec in (self.documents).items():
             docDist = euclidean(questionVec, docVec)
             scoresList.append(((1/docDist), docTitle))
-            # if docDist < cutoff:
-            #     docDiff = np.subtract(questionVec, docVec)
-            #     diffDict = datasetVectorizer.vec_to_dict(docDiff)
-            #     diffDf = pd.DataFrame([diffDict])
-            #     prediction = self.model.predict(diffDf)[0]
-            #     if prediction > 0.6:
-            #         scoresList.append((prediction, docTitle))
-            # print(f'\tSearching: {counterList[counter%counterLen]}', end='\r')
-            # counter += 1
+            if docDist < cutoff:
+                docDiff = np.subtract(questionVec, docVec)
+                diffDict = datasetVectorizer.vec_to_dict(docDiff)
+                diffDf = pd.DataFrame([diffDict])
+                prediction = self.model.predict(diffDf)[0]
+                if prediction > 0.6:
+                    scoresList.append((prediction, docTitle))
+            print(f'\tSearching: {counterList[counter%counterLen]}', end='\r')
+            counter += 1
         scoresList.sort(reverse=True)
         return [scoreTuple[1] for scoreTuple in scoresList[:n]]
