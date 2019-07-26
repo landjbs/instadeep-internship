@@ -59,6 +59,7 @@ def read_question_dataset(path, n, outPath=None):
                         break
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
                     try:
+                        print(questionDict['annotations'][0]['long_answer']['start_token'])
                         # get question text and vectorize
                         questionText = questionDict['question_text']
                         questionVec = docVecs.vectorize_doc(questionText)

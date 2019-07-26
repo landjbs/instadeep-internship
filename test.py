@@ -5,22 +5,12 @@
 # from utils.cleaner import clean_text
 
 
-# from documentRetrieval.questionReading import read_question_dataset
-# PATH = 'data/inData/natural_questions/v1.0/train'
-# x = read_question_dataset(PATH, n=2500, outPath='data/outData/questionsDf2500.sav')
+from documentRetrieval.questionReading import read_question_dataset
+PATH = 'data/inData/natural_questions/v1.0/train'
+x = read_question_dataset(PATH, n=2500, outPath='data/outData/questionsDf2500.sav')
 
 
 # from documentRetrieval.modelTraining import train_retrieval_model
 # retrievalModel = train_retrieval_model(inPath='data/outData/questionsDf2500.sav',
 #                                         numWrong=3,
 #                                         outPath='data/outData/models/documentRetrievalModel2500.sav')
-
-from documentRetrieval.retreiverAPI import Retreiver
-wikiSearcher = Retreiver('data/inData/wikipedia_utf8_filtered_20pageviews.csv', n=200, sep="  ")
-wikiSearcher.display_titles()
-while True:
-    search = input("Search: ")
-    resultList = wikiSearcher.retrieve(search, n=5, cutoff=12)
-    print('Results:')
-    for result in resultList:
-        print(f'\t{result}')
