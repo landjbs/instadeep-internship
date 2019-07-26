@@ -38,6 +38,7 @@ class Retreiver():
 
     def retrieve(self, question, n, cutoff=None):
         """ Retrieves top n files stored in retriver object """
+        # cutoff  is infinite if none is given
         if not cutoff:
             cutoff = inf
 
@@ -48,6 +49,7 @@ class Retreiver():
         counterList = ['-', '/', '+', '\\', '+', '|']
         counterLen = len(counterList)
         counter = 0
+
         for docTitle, docVec in (self.documents).items():
             docDist = euclidean(questionVec, docVec)
             scoresList.append(((1/docDist), docTitle))
@@ -58,7 +60,7 @@ class Retreiver():
                 prediction = self.model.predict(diffDf)[0]
                 if prediction > 0.6:
                     scoresList.append((prediction, docTitle))
-            print(f'\tSearching: {counterList[counter%counterLen]}', end='\r')
+            print(f'\tSearching: {counterList[counter % counterLen]}', end='\r')
             counter += 1
         scoresList.sort(reverse=True)
         return [scoreTuple[1] for scoreTuple in scoresList[:n]]
