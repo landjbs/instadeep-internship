@@ -59,37 +59,54 @@ def read_question_dataset(path, n, outPath=None):
                         break
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
                     try:
-                        longAnswerStart = (questionDict['annotations'][0]['long_answer']['start_token'])
-                        longAnswerEnd = (questionDict['annotations'][0]['long_answer']['end_token'])
-                        tokenList = questionDict['document_tokens']
-                        tokenWords = [tokenDict['token'] for tokenDict in tokenList]
-                        print(tokenWords[longAnswerStart:longAnswerEnd])
+                        answerInfo = questionDict['annotations'][0]
+                        shortAnswerInfo = answerInfo['short_answers']
+                        longAnswerInfo  = answerInfo['long_answer']
+
+                        pageTokens = questionDict['document_tokens']
+
+                        if not shortAnswerInfo==[]:
+                            shortStart = shortAnswerInfo[0]['start_token']
+                            shortEnd = shortAnswerInfo[0]['end_token']
+                            shortString = " ".join(tokenDict['token']
+                                                for tokenDict in pageTokens[shortStart:shortEnd])
+                            questionText = questionDict['question_text']
+                            # print(f'\n\n{questionText}\n\t{shortString}\n')
+
+                        if not longAnswerInfo==[]:
+                            longStart = longAnswerInfo['start_token']
+                            longEnd =   longAnswerInfo['end_token']
+                            longString = " ".join(tokenDict['token']
+                                                for tokenDict in pageTokens[longStart:longEnd])
+                            print(f'\n\n{questionText}\n\t{longString}\n')
+
+                        #### VECTORIZATION STUFF #####
                         # get question text and vectorize
-                        questionText = questionDict['question_text']
-                        questionVec = docVecs.vectorize_doc(questionText)
-
-                        # get cleaned string of title and text and vectorie
-                        title, text = clean_wiki_html(questionDict['document_html'])
-                        titleVec = docVecs.vectorize_doc(title)
-                        textVec = docVecs.vectorize_doc(text)
-
-                        # get list of start locations for each long answer candidate
-                        longAnswerCandidates = questionDict['long_answer_candidates']
-                        longAnswerStarts = [candidate['start_token']
-                                            for candidate in longAnswerCandidates]
-
-                        # get the url of the page
-                        pageUrl = questionDict['document_url']
-
-                        # convert question data into dict and append to fileData list
-                        columnDict =  {'pageUrl':           pageUrl,
-                                        'questionText':     questionText,
-                                        'questionVec':      questionVec,
-                                        'titleVec':         titleVec,
-                                        'textVec':          textVec,
-                                        'longAnswerStarts': longAnswerStarts}
-                        # yield columnDict
-                        fileData.append(columnDict)
+                        # questionText = questionDict['question_text']
+                        # questionVec = docVecs.vectorize_doc(questionText)
+                        #
+                        # # get cleaned string of title and text and vectorie
+                        # title, text = clean_wiki_html(questionDict['document_html'])
+                        # titleVec = docVecs.vectorize_doc(title)
+                        # textVec = docVecs.vectorize_doc(text)
+                        #
+                        # # get list of start locations for each long answer candidate
+                        # longAnswerCandidates = questionDict['long_answer_candidates']
+                        # longAnswerStarts = [candidate['start_token']
+                        #                     for candidate in longAnswerCandidates]
+                        #
+                        # # get the url of the page
+                        # pageUrl = questionDict['document_url']
+                        #
+                        # # convert question data into dict and append to fileData list
+                        # columnDict =  {'pageUrl':           pageUrl,
+                        #                 'questionText':     questionText,
+                        #                 'questionVec':      questionVec,
+                        #                 'titleVec':         titleVec,
+                        #                 'textVec':          textVec,
+                        #                 'longAnswerStarts': longAnswerStarts}
+                        # # yield columnDict
+                        # fileData.append(columnDict)
 
                     except Exception as e:
                         print(colored(f'\tException: {e}', 'red'))
