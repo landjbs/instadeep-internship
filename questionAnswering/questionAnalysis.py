@@ -13,11 +13,10 @@ def build_question_database(path, n, outPath=None):
         -n:         The number of questions to analyze from each file
         -outPath:   The path to which to save the dataframe
     """
-    startTime = time()
+
     def scrape_wiki_file(file):
         """ Helper pulls information out of wiki file and returns dict """
         if not file.endswith('.jsonl'):
-            print(colored(f'WARNING: Cannot analyze "{file}"', 'red'))
             return []
         else:
             print(colored(f'Analyzing: "{file}"', 'cyan'))
@@ -63,10 +62,10 @@ def build_question_database(path, n, outPath=None):
 
                 return fileData
 
+    startTime = time()
     # fold scraper on files under path to create list of columnDicts
     fold_info_list = lambda prev, file : prev + scrape_wiki_file(file)
     infoList = reduce(fold_info_list, listdir(path), [])
-
     # convert list to dataframe
     dataframe = pd.DataFrame(infoList)
 
