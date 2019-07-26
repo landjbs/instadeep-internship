@@ -1,4 +1,4 @@
-# from vectorizers.docVecs import vectorize_doc
+import re
 from functools import reduce
 from time import time
 from os import listdir
@@ -6,6 +6,7 @@ import pandas as pd
 from termcolor import colored
 import json_lines
 from utils.cleaner import clean_web_text
+# from vectorizers.docVecs import vectorize_doc
 
 
 def build_question_database(path, n, outPath=None):
@@ -37,11 +38,14 @@ def build_question_database(path, n, outPath=None):
                         answerInfo = questionDict['annotations'][0]
                         longAnswerInfo  = answerInfo['long_answer']
                         pageTokens = questionDict['document_tokens']
+                        rawHTML = " ".join(tokenDict['token']
+                                            for tokenDict in pageTokens)
 
+                        paragraphs = re.findall(r'(?<=<P>)[^$]+(?=</P>)',
+                                                string=rawHTML,
+                                                flags=re.IGNORECASE)
 
-                        pageText = clean_web_text(" ".join(tokenDict['token']
-                                                for tokenDict in pageTokens))
-                        print(pageText)
+                        print(paragraphs)
 
                         # if longAnswerInfo==[]:
                         #     raise ValueError("No long answer text.")
