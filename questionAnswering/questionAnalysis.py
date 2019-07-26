@@ -38,37 +38,55 @@ def build_question_database(path, n, outPath=None):
                         answerInfo = questionDict['annotations'][0]
                         longAnswerInfo  = answerInfo['long_answer']
                         pageTokens = questionDict['document_tokens']
-                        rawHTML = " ".join(tokenDict['token']
-                                            for tokenDict in pageTokens)
+
+                        if longAnswerInfo==[]:
+                            raise ValueError("No long answer text.")
+
+                        # get attributes of long answer
+                        longStart = longAnswerInfo['start_token']
+                        longEnd =   longAnswerInfo['end_token']
+                        longText = " ".join(tokenDict['token']
+                                        for tokenDict in pageTokens[longStart:longEnd])
+
+                        # longVec = vectorize_doc(longText)
+
+                        colomnDict = {'questionText': questionText,
+                                        'questionVec': questionVec}
+
+                        # get vec of all other paragraphs
+                        nonAnswerTokens = pageTokens[:longStart] + pageTokens[longEnd:]
+                        # compile tokens outside of answer into single string
+                        nonAnswerHTML = " ".join(tokenDict['token']
+                                            for tokenDict in nonAnswerTokens)
 
                         paragraphs = re.findall(r'(?<=<P>)[^$]+(?=</P>)',
-                                                string=rawHTML,
+                                                string=nonAnswerHTML,
                                                 flags=re.IGNORECASE)
 
-                        def process_paragraph(paragraph):
-                            cleanParagraph = clean_web_text(paragraph)
-                            paraVec = vectorize_doc(cleanParagraph)
-                            paraLen = len(cleanParagraph.split())
+                        for paragraph in paragraphs:
+                            print(clean_web_text(paragraph))
 
-
-                        paraDict = {f'wrong{i}':process_paragraph(para)
-                                    for para in paragraphs}
-                        print(paraDict)
-
-                        # if longAnswerInfo==[]:
-                        #     raise ValueError("No long answer text.")
+                        # def process_paragraph(paragraph):
+                        #     cleanParagraph = clean_web_text(paragraph)
+                        #     paraVec = vectorize_doc(cleanParagraph)
+                        #     paraLen = len(cleanParagraph.split())
                         #
                         #
-                        # longStart = longAnswerInfo['start_token']
-                        # longEnd =   longAnswerInfo['end_token']
-                        # longString = " ".join(tokenDict['token']
-                        #                     for tokenDict in pageTokens[longStart:longEnd])
-                        # longVec = vectorize_doc(longString)
-                        #
-                        # # convert question data into dict and append to fileData list
-                        # columnDict =  {'questionText':      questionText,
-                        #                 'questionVec':      questionVec,
-                        #                 'longVec':          longVec}
+                        # paraDict = {f'wrong{i}':process_paragraph(para)
+                        #             for para in paragraphs}
+                        # print(paraDict)
+
+
+
+
+                        longString = " ".join(tokenDict['token']
+                                            for tokenDict in pageTokens[longStart:longEnd])
+                        longVec = vectorize_doc(longString)
+
+                        # convert question data into dict and append to fileData list
+                        columnDict =  {'questionText':      questionText,
+                                        'questionVec':      questionVec,
+                                        'longVec':          longVec}
                         columnDict = {}
 
                         fileData.append(columnDict)
