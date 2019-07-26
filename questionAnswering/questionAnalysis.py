@@ -27,11 +27,8 @@ def build_question_database(path, n, outPath=None):
                         break
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
                     try:
-                        # shortAnswerInfo = answerInfo['short_answers']
-
                         # get question text and vectorize
                         questionText = questionDict['question_text']
-                        print(questionText)
                         questionVec = vectorize_doc(questionText)
 
                         # get list of start locations for each long answer candidate
@@ -48,13 +45,11 @@ def build_question_database(path, n, outPath=None):
                                             for tokenDict in pageTokens[longStart:longEnd])
                         longVec = vectorize_doc(longString)
 
-                        # get the url of the page
-                        pageUrl = questionDict['document_url']
-
                         # convert question data into dict and append to fileData list
                         columnDict =  {'questionText':      questionText,
                                         'questionVec':      questionVec,
                                         'longVec':          longVec}
+                                        
                         fileData.append(columnDict)
 
                     except Exception as e:
