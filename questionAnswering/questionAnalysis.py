@@ -1,5 +1,10 @@
 from vectorizers.docVecs import vectorize_doc
-
+from functools import reduce
+from time import time
+from os import listdir
+import pandas as pd
+from termcolor import colored
+import json_lines
 
 def build_question_database(path, n, outPath=None):
     """
@@ -13,6 +18,7 @@ def build_question_database(path, n, outPath=None):
         """ Helper pulls information out of wiki file and returns dict """
         if not file.endswith('.jsonl'):
             print(colored(f'WARNING: Cannot analyze "{file}"', 'red'))
+            return []
         else:
             print(colored(f'Analyzing: "{file}"', 'cyan'))
             fileData = []
@@ -26,6 +32,7 @@ def build_question_database(path, n, outPath=None):
 
                         # get question text and vectorize
                         questionText = questionDict['question_text']
+                        print(questionText)
                         questionVec = vectorize_doc(questionText)
 
                         # get list of start locations for each long answer candidate
@@ -35,24 +42,20 @@ def build_question_database(path, n, outPath=None):
 
                         if longAnswerInfo==[]:
                             raise ValueError("No long answer text.")
+
                         longStart = longAnswerInfo['start_token']
                         longEnd =   longAnswerInfo['end_token']
                         longString = " ".join(tokenDict['token']
                                             for tokenDict in pageTokens[longStart:longEnd])
-                        longVec = vectorize_doc
-
+                        longVec = vectorize_doc(longString)
 
                         # get the url of the page
                         pageUrl = questionDict['document_url']
 
                         # convert question data into dict and append to fileData list
-                        columnDict =  {'pageUrl':           pageUrl,
-                                        'questionText':     questionText,
+                        columnDict =  {'questionText':      questionText,
                                         'questionVec':      questionVec,
-                                        'titleVec':         titleVec,
-                                        'textVec':          textVec,
-                                        'longAnswerStarts': longAnswerStarts}
-                        # yield columnDict
+                                        'longVec':          longVec}
                         fileData.append(columnDict)
 
                     except Exception as e:
@@ -60,13 +63,11 @@ def build_question_database(path, n, outPath=None):
 
                 return fileData
 
-    # scrape files under path and filter out instances of None
-    infoList = []
-    for file in listdir(path):
-        scrapeList = scrape_wiki_file(file)
-        if scrapeList:
-            infoList += scrapeList
+    # fold scraper on files under path to create list of columnDicts
+    fold_info_list = lambda prev, file : prev + scrape_wiki_file(file)
+    infoList = reduce(fold_info_list, listdir(path), [])
 
+    # convert list to dataframe
     dataframe = pd.DataFrame(infoList)
 
     # save to outPath if give
