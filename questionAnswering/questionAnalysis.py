@@ -6,11 +6,7 @@ import pandas as pd
 from termcolor import colored
 import json_lines
 from utils.cleaner import clean_web_text
-# from vectorizers.docVecs import vectorize_doc
-
-def vectorize_doc(x):
-    return []
-
+from vectorizers.docVecs import vectorize_doc
 
 def build_question_database(path, n, outPath=None):
     """
