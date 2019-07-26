@@ -8,6 +8,9 @@ import json_lines
 from utils.cleaner import clean_web_text
 # from vectorizers.docVecs import vectorize_doc
 
+def vectorize_doc(x):
+    return []
+
 
 def build_question_database(path, n, outPath=None):
     """
@@ -32,7 +35,7 @@ def build_question_database(path, n, outPath=None):
                     try:
                         # get question text and vectorize
                         questionText = questionDict['question_text']
-                        # questionVec = vectorize_doc(questionText)
+                        questionVec = vectorize_doc(questionText)
 
                         # get list of start locations for each long answer candidate
                         answerInfo = questionDict['annotations'][0]
@@ -47,49 +50,32 @@ def build_question_database(path, n, outPath=None):
                         longEnd =   longAnswerInfo['end_token']
                         longText = " ".join(tokenDict['token']
                                         for tokenDict in pageTokens[longStart:longEnd])
+                        # clean and vectorize long answer text
+                        longVec = vectorize_doc(clean_web_text(longText))
 
-                        # longVec = vectorize_doc(longText)
+                        columnDict = {'questionText':   questionText,
+                                        'questionVec':  questionVec,
+                                        'paraVec':      longVec,
+                                        'score':        1}
 
-                        colomnDict = {'questionText': questionText,
-                                        'questionVec': questionVec}
+                        fileData.append(columnDict)
 
                         # get vec of all other paragraphs
                         nonAnswerTokens = pageTokens[:longStart] + pageTokens[longEnd:]
                         # compile tokens outside of answer into single string
                         nonAnswerHTML = " ".join(tokenDict['token']
                                             for tokenDict in nonAnswerTokens)
-
+                        # get list of nonAnswer paragraphs
                         paragraphs = re.findall(r'(?<=<P>)[^$]+(?=</P>)',
                                                 string=nonAnswerHTML,
                                                 flags=re.IGNORECASE)
 
                         for paragraph in paragraphs:
-                            print(clean_web_text(paragraph))
-
-                        # def process_paragraph(paragraph):
-                        #     cleanParagraph = clean_web_text(paragraph)
-                        #     paraVec = vectorize_doc(cleanParagraph)
-                        #     paraLen = len(cleanParagraph.split())
-                        #
-                        #
-                        # paraDict = {f'wrong{i}':process_paragraph(para)
-                        #             for para in paragraphs}
-                        # print(paraDict)
-
-
-
-
-                        longString = " ".join(tokenDict['token']
-                                            for tokenDict in pageTokens[longStart:longEnd])
-                        longVec = vectorize_doc(longString)
-
-                        # convert question data into dict and append to fileData list
-                        columnDict =  {'questionText':      questionText,
-                                        'questionVec':      questionVec,
-                                        'longVec':          longVec}
-                        columnDict = {}
-
-                        fileData.append(columnDict)
+                            curColumnDict = columnDict.copy()
+                            paraVec = vectorize_doc(clean_web_text(paragraph))
+                            curColumnDict.update({'paraVec': paraVec,
+                                                    'score': 0})
+                            fileData.append(curColumnDict)
 
                     except Exception as e:
                         print(colored(f'\tException: {e}', 'red'))
@@ -102,7 +88,7 @@ def build_question_database(path, n, outPath=None):
     infoList = reduce(fold_info_list, listdir(path), [])
     # convert list to dataframe
     dataframe = pd.DataFrame(infoList)
-
+    print(dataframe)
     # save to outPath if give
     if outPath:
         dataframe.to_pickle(outPath)
