@@ -37,6 +37,7 @@ def build_question_database(path, n, outPath=None):
                         answerInfo = questionDict['annotations'][0]
                         longAnswerInfo  = answerInfo['long_answer']
                         pageTokens = questionDict['document_tokens']
+
                         if longAnswerInfo==[]:
                             raise ValueError("No long answer text.")
 
