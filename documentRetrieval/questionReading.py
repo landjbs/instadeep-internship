@@ -65,20 +65,12 @@ def read_question_dataset(path, n, outPath=None):
 
                         pageTokens = questionDict['document_tokens']
 
-                        if not shortAnswerInfo==[]:
-                            shortStart = shortAnswerInfo[0]['start_token']
-                            shortEnd = shortAnswerInfo[0]['end_token']
-                            shortString = " ".join(tokenDict['token']
-                                                for tokenDict in pageTokens[shortStart:shortEnd])
-                            questionText = questionDict['question_text']
-                            # print(f'\n\n{questionText}\n\t{shortString}\n')
-
                         if not longAnswerInfo==[]:
                             longStart = longAnswerInfo['start_token']
                             longEnd =   longAnswerInfo['end_token']
                             longString = " ".join(tokenDict['token']
                                                 for tokenDict in pageTokens[longStart:longEnd])
-                            print(f'\n\n{questionText}\n\t{longString}\n')
+                            print(f'\n\n{questionText}\n\t{clean_web_text(longString)}\n')
 
                         #### VECTORIZATION STUFF #####
                         # get question text and vectorize
