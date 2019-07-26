@@ -45,7 +45,15 @@ def build_question_database(path, n, outPath=None):
                                                 string=rawHTML,
                                                 flags=re.IGNORECASE)
 
-                        print(paragraphs)
+                        def process_paragraph(paragraph):
+                            cleanParagraph = clean_web_text(paragraph)
+                            paraVec = vectorize_doc(cleanParagraph)
+                            paraLen = len(cleanParagraph.split())
+
+
+                        paraDict = {f'wrong{i}':process_paragraph(para)
+                                    for para in paragraphs}
+                        print(paraDict)
 
                         # if longAnswerInfo==[]:
                         #     raise ValueError("No long answer text.")
