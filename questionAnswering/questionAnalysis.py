@@ -1,10 +1,12 @@
-from vectorizers.docVecs import vectorize_doc
+# from vectorizers.docVecs import vectorize_doc
 from functools import reduce
 from time import time
 from os import listdir
 import pandas as pd
 from termcolor import colored
 import json_lines
+from utils.cleaner import clean_web_text
+
 
 def build_question_database(path, n, outPath=None):
     """
@@ -29,27 +31,34 @@ def build_question_database(path, n, outPath=None):
                     try:
                         # get question text and vectorize
                         questionText = questionDict['question_text']
-                        questionVec = vectorize_doc(questionText)
+                        # questionVec = vectorize_doc(questionText)
 
                         # get list of start locations for each long answer candidate
                         answerInfo = questionDict['annotations'][0]
                         longAnswerInfo  = answerInfo['long_answer']
                         pageTokens = questionDict['document_tokens']
 
-                        if longAnswerInfo==[]:
-                            raise ValueError("No long answer text.")
 
-                        longStart = longAnswerInfo['start_token']
-                        longEnd =   longAnswerInfo['end_token']
-                        longString = " ".join(tokenDict['token']
-                                            for tokenDict in pageTokens[longStart:longEnd])
-                        longVec = vectorize_doc(longString)
+                        pageText = clean_web_text(" ".join(tokenDict['token']
+                                                for tokenDict in pageTokens))
+                        print(pageText)
 
-                        # convert question data into dict and append to fileData list
-                        columnDict =  {'questionText':      questionText,
-                                        'questionVec':      questionVec,
-                                        'longVec':          longVec}
-                                        
+                        # if longAnswerInfo==[]:
+                        #     raise ValueError("No long answer text.")
+                        #
+                        #
+                        # longStart = longAnswerInfo['start_token']
+                        # longEnd =   longAnswerInfo['end_token']
+                        # longString = " ".join(tokenDict['token']
+                        #                     for tokenDict in pageTokens[longStart:longEnd])
+                        # longVec = vectorize_doc(longString)
+                        #
+                        # # convert question data into dict and append to fileData list
+                        # columnDict =  {'questionText':      questionText,
+                        #                 'questionVec':      questionVec,
+                        #                 'longVec':          longVec}
+                        columnDict = {}
+
                         fileData.append(columnDict)
 
                     except Exception as e:
