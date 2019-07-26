@@ -41,7 +41,6 @@ def build_question_database(path, n, outPath=None):
                         answerInfo = questionDict['annotations'][0]
                         longAnswerInfo  = answerInfo['long_answer']
                         pageTokens = questionDict['document_tokens']
-
                         if longAnswerInfo==[]:
                             raise ValueError("No long answer text.")
 
@@ -50,6 +49,8 @@ def build_question_database(path, n, outPath=None):
                         longEnd =   longAnswerInfo['end_token']
                         longText = " ".join(tokenDict['token']
                                         for tokenDict in pageTokens[longStart:longEnd])
+
+                        print(clean_web_text(longText))
                         # clean and vectorize long answer text
                         longVec = vectorize_doc(clean_web_text(longText))
 
