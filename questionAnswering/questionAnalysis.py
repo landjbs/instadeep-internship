@@ -34,7 +34,7 @@ def build_question_database(path, n, outPath=None):
                         questionText    =   questionDict['question_text']
                         questionVec     =   vectorize_doc(questionText)
 
-                        print(f"-{questionText}", end='')
+                        print(f"-{questionText}")
 
                         # get list of start locations for each long answer candidate
                         answerInfo      =   questionDict['annotations'][0]
@@ -59,7 +59,12 @@ def build_question_database(path, n, outPath=None):
                                                     for tokenDict
                                                     in pageTokens[shortStart:shortEnd])
 
-                            print(f"\n\t{clean_web_text(shortText)}")
+                        # for tokenNum, tokenDict in enumerate(pageTokens):
+                        #     if tokenNum in range(shortStart, shortEnd):
+                        #         print(colored(tokenDict['token'], 'red'), end=' ')
+                        #     else:
+                        #         pass
+                                # print(tokenDict['token'], end=' ')
 
                         # clean and vectorize long answer text
                         longVec = vectorize_doc(clean_web_text(longText))
