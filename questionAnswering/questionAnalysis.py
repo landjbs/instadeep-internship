@@ -38,61 +38,18 @@ def build_question_database(path, n, outPath=None):
 
                         # get list of start locations for each long answer candidate
                         answerInfo      =   questionDict['annotations'][0]
-                        longAnswerInfo  =   answerInfo['long_answer']
                         shortAnswerInfo =   answerInfo['short_answers']
                         pageTokens      =   questionDict['document_tokens']
 
-                        # if longAnswerInfo==[]:
-                        #     raise ValueError("No long answer text.")
-
-                        # get attributes of long answer
-                        longStart   =   longAnswerInfo['start_token']
-                        longEnd     =   longAnswerInfo['end_token']
-                        longText    =   " ".join(tokenDict['token']
-                                                for tokenDict
-                                                in pageTokens[longStart:longEnd])
 
                         if not (shortAnswerInfo==[]):
                             shortStart  =   shortAnswerInfo[0]['start_token']
                             shortEnd    =   shortAnswerInfo[0]['end_token']
-                            shortText   =   " ".join(tokenDict['token']
-                                                    for tokenDict
-                                                    in pageTokens[shortStart:shortEnd])
 
-                        # for tokenNum, tokenDict in enumerate(pageTokens):
-                        #     if tokenNum in range(shortStart, shortEnd):
-                        #         print(colored(tokenDict['token'], 'red'), end=' ')
-                        #     else:
-                        #         pass
-                                # print(tokenDict['token'], end=' ')
+                        pageText = " ".join(tokenDict['token'] for tokenDict in )
 
-                        # clean and vectorize long answer text
-                        longVec = vectorize_doc(clean_web_text(longText))
 
-                        columnDict = {'questionText'    :   questionText,
-                                        'questionVec'   :   questionVec,
-                                        'paraVec'       :   longVec,
-                                        'score'         :   1}
-
-                        fileData.append(columnDict)
-
-                        # get vec of all other paragraphs
-                        nonAnswerTokens = pageTokens[:longStart] + pageTokens[longEnd:]
-                        # compile tokens outside of answer into single string
-                        nonAnswerHTML = " ".join(tokenDict['token']
-                                            for tokenDict in nonAnswerTokens)
-                        # get list of nonAnswer paragraphs
-                        paragraphs = re.findall(r'(?<=<P>)[^$]+(?=</P>)',
-                                                string=nonAnswerHTML,
-                                                flags=re.IGNORECASE)
-
-                        for paragraph in paragraphs:
-                            curColumnDict = columnDict.copy()
-                            cleanPara = clean_web_text(paragraph)
-                            paraVec = vectorize_doc(cleanPara)
-                            curColumnDict.update({'paraVec': paraVec,
-                                                    'score': 0})
-                            fileData.append(curColumnDict)
+                        fileData.append(curColumnDict)
 
                     except Exception as e:
                         print(colored(f'\tException: {e}', 'red'))
