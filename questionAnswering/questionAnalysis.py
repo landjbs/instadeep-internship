@@ -45,8 +45,13 @@ def build_question_database(path, n, outPath=None):
                         if not (shortAnswerInfo==[]):
                             shortStart  =   shortAnswerInfo[0]['start_token']
                             shortEnd    =   shortAnswerInfo[0]['end_token']
+                            answerWords =   " ".join(tokenDict['token']
+                                                for tokenDict in pageTokens[shortStart:shortEnd])
+                            print(answerWords)
+                        else:
+                            print('non')
 
-                        pageText = " ".join(tokenDict['token'] for tokenDict in )
+                        # pageText = " ".join(tokenDict['token'] for tokenDict in )
 
 
                         fileData.append(curColumnDict)
