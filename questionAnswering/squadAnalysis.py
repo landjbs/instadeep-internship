@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 def clean_text(text):
-    return re.sub(r'[(\[].+[\])]', "", text)
+    return re.sub(r'e.g.', "", text)
 
 answerMetrics = []
 with open('data/inData/train-v2.0.json') as squadFile:
@@ -22,6 +22,6 @@ with open('data/inData/train-v2.0.json') as squadFile:
                         if answerText in sent:
                             isIn = True
                     if not isIn:
-                        print(answerText)
+                        print(f'{answerText}\n{paraSents}')
                 else:
                     pass
