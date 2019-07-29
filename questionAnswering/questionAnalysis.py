@@ -31,40 +31,43 @@ def build_question_database(path, n, outPath=None):
                     print(colored(f'\tReading Questions: {i}', 'yellow'), end='\r')
                     try:
                         # get question text and vectorize
-                        questionText = questionDict['question_text']
-                        questionVec = vectorize_doc(questionText)
+                        questionText    =   questionDict['question_text']
+                        questionVec     =   vectorize_doc(questionText)
 
-                        print(f"-{questionText}")
+                        print(f"-{questionText}", end='')
 
                         # get list of start locations for each long answer candidate
-                        answerInfo = questionDict['annotations'][0]
-                        longAnswerInfo  = answerInfo['long_answer']
-                        shortAnswerInfo = answerInfo['short_answers']
-                        pageTokens = questionDict['document_tokens']
+                        answerInfo      =   questionDict['annotations'][0]
+                        longAnswerInfo  =   answerInfo['long_answer']
+                        shortAnswerInfo =   answerInfo['short_answers']
+                        pageTokens      =   questionDict['document_tokens']
 
                         # if longAnswerInfo==[]:
                         #     raise ValueError("No long answer text.")
 
                         # get attributes of long answer
-                        longStart = longAnswerInfo['start_token']
-                        longEnd =   longAnswerInfo['end_token']
-                        longText = " ".join(tokenDict['token']
-                                        for tokenDict in pageTokens[longStart:longEnd])
+                        longStart   =   longAnswerInfo['start_token']
+                        longEnd     =   longAnswerInfo['end_token']
+                        longText    =   " ".join(tokenDict['token']
+                                                for tokenDict
+                                                in pageTokens[longStart:longEnd])
 
-                        shortStart = shortAnswerInfo['start_token']
-                        shortEnd = shortAnswerInfo['end_token']
-                        shortText = " ".join(tokenDict['token']
-                                        for tokenDict in pageTokens[shortStart:shortEnd])
+                        if not (shortAnswerInfo==[]):
+                            shortStart  =   shortAnswerInfo[0]['start_token']
+                            shortEnd    =   shortAnswerInfo[0]['end_token']
+                            shortText   =   " ".join(tokenDict['token']
+                                                    for tokenDict
+                                                    in pageTokens[shortStart:shortEnd])
 
-                        print(f"\n\t{clean_web_text(longText)}")
+                            print(f"\n\t{clean_web_text(shortText)}")
 
                         # clean and vectorize long answer text
                         longVec = vectorize_doc(clean_web_text(longText))
 
-                        columnDict = {'questionText':   questionText,
-                                        'questionVec':  questionVec,
-                                        'paraVec':      longVec,
-                                        'score':        1}
+                        columnDict = {'questionText'    :   questionText,
+                                        'questionVec'   :   questionVec,
+                                        'paraVec'       :   longVec,
+                                        'score'         :   1}
 
                         fileData.append(columnDict)
 
@@ -81,7 +84,6 @@ def build_question_database(path, n, outPath=None):
                         for paragraph in paragraphs:
                             curColumnDict = columnDict.copy()
                             cleanPara = clean_web_text(paragraph)
-                            print(f'({len(cleanPara)})')
                             paraVec = vectorize_doc(cleanPara)
                             curColumnDict.update({'paraVec': paraVec,
                                                     'score': 0})
