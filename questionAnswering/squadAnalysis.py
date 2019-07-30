@@ -27,7 +27,12 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
     firstAnswerWord = answerTokens[0]
     for i, word in enumerate(paragraphTokens):
         if (word == firstAnswerWord):
-            
+            if all((word in answerTokens) for word
+                    in paragraphTokens[i : (i + answerLen)]):
+                answerStart, answerEnd = i, (i + answerLen)
+    paragraphTargets = [1 if i in range(answerStart, answerEnd) else 0
+                        for i in range(len(paragraphTokens))]
+    return ([0 for _ in range(len(answerTokens))] + paragraphTargets)
 
 
 with open('data/inData/train-v2.0.json') as squadFile:
@@ -54,7 +59,7 @@ with open('data/inData/train-v2.0.json') as squadFile:
                 if not answerList==[]:
                     answerText = answerList[0]['text'].lower()
                     answerTokens = word_tokenize(answerText)
-                    print(f'\t{answerTokens}')
+                    targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
 
 
 
