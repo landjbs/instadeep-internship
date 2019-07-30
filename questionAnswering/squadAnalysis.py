@@ -9,6 +9,9 @@ from bert_serving.client import BertClient
 bc = BertClient(check_length=True)
 
 dataList = []
+
+check_empty = lambda wordVec : wordVec[0] != 0
+
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
@@ -16,7 +19,9 @@ with open('data/inData/train-v2.0.json') as squadFile:
         for paragraph in categorty['paragraphs']:
             paragraphText = paragraph['context'].lower()
             paragraphTokens = word_tokenize(paragraphText)
-
+            paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
+            paragraphVec = list(filter(check_empty, paragraphVec))
+            print(len(paragraphVec))
 
             # for qas in paragraph['qas']:
             #     answerList = qas['answers']
