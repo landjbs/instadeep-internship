@@ -4,24 +4,30 @@ import torch.nn.functional as F
 import torch.optim as optim
 import matplotlib.pyplot as plt
 
+from bert_serving.client import BertClient
+
+bc = BertClient(check_length=True)
+
 torch.manual_seed(1)
 
 def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
-
 training_data = [
-    ("The dog ate an apple that ran".split(), ["DET", "NN", "V", "DET", "NN", 'DET', 'V']),
-    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
+    ("How are you? I am well".lower().split(), [0,0,0,0,0,1]),
+    ("Who are you? I am me".lower().split(), [0,0,0,0,0,1]),
+    ("What are you? I am me".lower().split(), [0,0,0, 1,1,0])
 ]
+
 word_to_ix = {}
 for sent, tags in training_data:
     for word in sent:
         if word not in word_to_ix:
-            word_to_ix[word] = len(word_to_ix)
+            word_to_ix[word] = bc.encode([word])[0][1]
 print(word_to_ix)
-tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
+
+tag_to_ix = {0: 0, 1: 1}
 
 # These will usually be more like 32 or 64 dimensional.
 # We will keep them small, so we can see how the weights change as we train.
@@ -86,7 +92,7 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
 # See what the scores are after training
 with torch.no_grad():
-    inputs = prepare_sequence(('that book read').split(), word_to_ix) # training_data[0][0]
+    inputs = prepare_sequence(('what are you? i am me').split(), word_to_ix) # training_data[0][0]
     tag_scores = model(inputs)
 
     # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
