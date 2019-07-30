@@ -17,17 +17,16 @@ with open('data/inData/train-v2.0.json') as squadFile:
         for paragraph in (categorty['paragraphs']):
             paragraphText = paragraph['context'].lower()
             # paragraphEmbeddings = get_word_encodings(paragraphText)
-
-
-            # for qas in paragraph['qas']:
-            #     question = qas['question'].lower()
-            #     answerList = qas['answers']
-            #     if answerList==[]:
-            #         answerTokens = None
-            #     else:
-            #         print(question)
-            #         answerText = answerList[0]['text'].lower()
-            #         print(paragraphText.index(answerText))
-            #         print(answerList[0]['answer_start'])
-            # except:
-            #     pass
+            paragraphWords = word_tokenize(paragraphText)
+            print(paragraphWords)
+            for qas in paragraph['qas']:
+                question = qas['question'].lower()
+                answerList = qas['answers']
+                if answerList==[]:
+                    answerTokens = None
+                else:
+                    print(question)
+                    answerText = answerList[0]['text'].lower()
+                    answerStart = answerList[0]['answer_start']
+                    answerSpan = (answerStart, (answerStart + (len(answerText))))
+                    print(answerText, answerSpan)
