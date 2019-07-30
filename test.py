@@ -12,7 +12,7 @@ def prepare_sequence(seq, to_ix):
 
 
 training_data = [
-    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
+    ("The dog ate an apple that ran".split(), ["DET", "NN", "V", "DET", "NN", 'DET', 'V']),
     ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
 ]
 word_to_ix = {}
@@ -26,7 +26,7 @@ tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
 # These will usually be more like 32 or 64 dimensional.
 # We will keep them small, so we can see how the weights change as we train.
 EMBEDDING_DIM = 6
-HIDDEN_DIM = 6
+HIDDEN_DIM = 30
 
 
 class LSTMTagger(nn.Module):
@@ -86,7 +86,7 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
 # See what the scores are after training
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
+    inputs = prepare_sequence(('that book read').split(), word_to_ix) # training_data[0][0]
     tag_scores = model(inputs)
 
     # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
