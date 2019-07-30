@@ -3,19 +3,24 @@ Modularized document vectorization tools
 """
 
 import re
-from math import floor
 import numpy as np
+from math import floor
+from functools import reduce
 from bert_serving.client import BertClient
 
 
 # bert-serving-start -model_dir /Users/landonsmith/Desktop/uncased_L-24_H-1024_A-16 -num_worker=1
 
-# bert-serving-start -pooling_strategy NONE -model_dir /Users/landonsmith/Desktop/shortBert -num_worker=1 -mask_cls_sep
+# bert-serving-start -pooling_strategy NONE -model_dir /Users/landonsmith/Desktop/shortBert -num_worker=1 -mask_cls_sep -max_seq_len=40
 
-bc = BertClient(check_length=False)
+bc = BertClient(check_length=True)
 
-sentenceMatcher = re.compile(r'[!|.|?]')
 
+class VectorizationError(Exception):
+    """ Class for errors during vectorization """
+    pass
+
+sentenceMatcher = re.compile(r'(?<=[\.\!\?;])[^a-zA-Z0-9]')
 
 ### Vectorization Methods ###
 def vectorize_doc(document):
@@ -23,11 +28,36 @@ def vectorize_doc(document):
     return bc.encode([document])[0]
 
 
+def get_word_encodings(text, maxLen=35):
+    """
+    Returns ordered list of word vec embeddings in context of their sentence.
+    Can handle text of any length, but raises Exception if any of the sentences
+    is longer than max_seq_len of BERT Client.
+    Does not include CLS or SEP tokens but does include individual punctuation
+    vectors.
+    """
+    # split by sentence and assert length
+    sentences = re.split(sentenceMatcher, text)
+    if any(len(sentence.split())>maxLen for sentence in sentences):
+        raise VectorizationError(f'Text contains sentence over {maxLen} words.')
+    # encode sentences
+    sentenceVecs = bc.encode(sentences)
+    # build and return list of contextual word embeddings
+    textVecs = []
+    for wordVecs in sentenceVecs:
+        for vec in wordVecs:
+            if not (vec[0]==0):
+                textVecs.append(vec)
+    return textVecs
+
+
 def vectorize_sentence_split(document, sentenceDelimiters=['!', '.', '?']):
     """ Vectorizes document as list of sentences; returns list of vectors """
     # build matcher
     if not (sentenceDelimiters==['!','.','?']):
         sentenceMatcher = re.compile(f"[{'|'.join(delimiter for delimiter in sentenceDelimiters)}]")
+    else:
+        sentenceMatcher = re.compile(r'[!|.|?]')
     # tokenize sentences and remove empty sentences
     splitDoc = [sentence for sentence in re.split(sentenceMatcher, document)
                 if not (sentence=="")]
