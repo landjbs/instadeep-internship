@@ -12,10 +12,9 @@ answerMetrics = []
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
+        
         for paragraph in (categorty['paragraphs']):
             paragraphText = paragraph['context'].lower()
-            # paragraphEmbeddings = get_word_encodings(paragraphText)
-            # paragraphWords = word_tokenize(paragraphText)
 
             sentences = sent_tokenize(paragraphText)
             tokenizedSents = [word_tokenize(sent) for sent in sentences]
