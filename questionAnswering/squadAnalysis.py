@@ -26,8 +26,5 @@ with open('data/inData/train-v2.0.json') as squadFile:
                         if answerText in sent:
                             isIn = True
                             numIn += 1
-                    if not isIn:
-                        # print(f'{answerText}\n{paraSents}')
-                        notIn += 1
                 else:
                     pass
