@@ -7,12 +7,10 @@ import numpy as np
 from math import floor
 from functools import reduce
 from bert_serving.client import BertClient
-
+from nltk.tokenize import word_tokenize, sent_tokenize
 
 # bert-serving-start -model_dir /Users/landonsmith/Desktop/uncased_L-24_H-1024_A-16 -num_worker=1
-
 # bert-serving-start -pooling_strategy NONE -model_dir /Users/landonsmith/Desktop/shortBert -num_worker=1 -mask_cls_sep -max_seq_len=40
-
 bc = BertClient(check_length=True)
 
 
@@ -20,7 +18,9 @@ class VectorizationError(Exception):
     """ Class for errors during vectorization """
     pass
 
-sentenceMatcher = re.compile(r'(?<=[\.\!\?;])[^a-zA-Z0-9]')
+
+# sentenceMatcher = re.compile(r'(?<=[\.\!\?;])[^a-zA-Z0-9]')
+
 
 ### Vectorization Methods ###
 def vectorize_doc(document):
@@ -37,17 +37,18 @@ def get_word_encodings(text, maxLen=35):
     vectors.
     """
     # split by sentence and assert length
-    sentences = re.split(sentenceMatcher, text)
-    if any(len(sentence.split())>maxLen for sentence in sentences):
-        raise VectorizationError(f'Text contains sentence over {maxLen} words.')
+    sentences = sent_tokenize(text)
+    print(sentences)
+    tokenizedSentences = [word_tokenize(sentence) for sentence in sentences]
+    print(tokenizedSentences)
     # encode sentences
-    sentenceVecs = bc.encode(sentences)
+    sentenceVecs = bc.encode(tokenizedSentences, is_tokenized=True)
     # build and return list of contextual word embeddings
     textVecs = []
-    for wordVecs in sentenceVecs:
-        for vec in wordVecs:
-            if not (vec[0]==0):
-                textVecs.append(vec)
+    for sentenceNum, wordVecs in enumerate(sentenceVecs):
+        for wordNum, wordVec in enumerate(wordVecs):
+            if not (wordVec[0]==0):
+                textVecs.append(wordVec)
     return textVecs
 
 

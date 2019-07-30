@@ -3,6 +3,7 @@ import json
 import numpy as np
 from tqdm import tqdm
 from vectorizers.docVecs import get_word_encodings
+from nltk.tokenize import word_tokenize, sent_tokenize
 
 def clean_text(text):
     decimalSub = re.sub(r'(?<=.)\.(?=.)', ',', text)
@@ -15,26 +16,18 @@ with open('data/inData/train-v2.0.json') as squadFile:
         print(f"Category: {categorty['title']}")
         for paragraph in (categorty['paragraphs']):
             paragraphText = paragraph['context'].lower()
-            try:
-                paragraphEmbeddings = get_word_encodings(paragraphText)
-                print(f"ASDFASDF: {len(paragraphEmbeddings)}")
-                for qas in paragraph['qas']:
-                    question = qas['question'].lower()
-                    answerList = qas['answers']
-                    if answerList==[]:
-                        answerTokens = None
-                    else:
-                        print(question)
-                        answerText = answerList[0]['text'].split()
-                        print(answerText)
-                        print(paragraphText[(answerList[0]['answer_start'])])
-            except:
-                pass
-                    # answerTokens =
-                # if not answerList==[]:
-                #     answerText = clean_text(answerList[0]['text'].lower())
-                #     for sent in paraSents:
-                #         if answerText in sent:
-                #             numIn += 1
-                # else:
-                #     pass
+            # paragraphEmbeddings = get_word_encodings(paragraphText)
+
+
+            # for qas in paragraph['qas']:
+            #     question = qas['question'].lower()
+            #     answerList = qas['answers']
+            #     if answerList==[]:
+            #         answerTokens = None
+            #     else:
+            #         print(question)
+            #         answerText = answerList[0]['text'].lower()
+            #         print(paragraphText.index(answerText))
+            #         print(answerList[0]['answer_start'])
+            # except:
+            #     pass
