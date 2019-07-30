@@ -10,27 +10,44 @@ bc = BertClient(check_length=True)
 
 dataList = []
 
-check_empty = lambda wordVec : wordVec[0] != 0
+def filter_text_vec(textVec):
+    """
+    filters out empty vectors of buffer words in text vec
+    and returns np.array of shape (numWords, numDims)
+    """
+    return np.array([wordVec for wordVec in textVec if not (wordVec[0]==0)])
+
 
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
 
         for paragraph in categorty['paragraphs']:
+            # convert paragraph into filtered array of contextual word vecs
             paragraphText = paragraph['context'].lower()
             paragraphTokens = word_tokenize(paragraphText)
             paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
-            paragraphVec = list(filter(check_empty, paragraphVec))
-            print(len(paragraphVec))
+            paragraphArray = filter_text_vec(paragraphVec)
+            print(f'Para: {(paragraphArray).shape}')
+            print(paragraphArray)
 
             # for qas in paragraph['qas']:
+            #     # convert question into filtered list of conxtual word vecs
+            #     question = qas['question'].lower()
+            #     print(question)
+            #     questionTokens = word_tokenize(question)
+            #     questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
+            #     questionVec = np.array(filter(check_empty, questionVec))
+            #
+            #     print(questionVec)
+            #
             #     answerList = qas['answers']
             #
             #     if not answerList==[]:
             #         answerText = answerList[0]['text'].lower()
             #         print(paragraphText.find(answerText))
-            #
-            #
+
+
 
 
 
