@@ -10,6 +10,42 @@ bc = BertClient(check_length=True)
 
 dataList = []
 with open('data/inData/train-v2.0.json') as squadFile:
+    for categorty in tqdm(json.load(squadFile)['data']):
+        # print(f"Category: {categorty['title']}")
+
+        for paragraph in categorty['paragraphs']:
+            paragraphText = paragraph['context'].lower()
+            paragraphTokesn = word_tokenize(paragraphText)
+            dataList.append(len(paragraphTokesn))
+
+            # for qas in paragraph['qas']:
+            #     answerList = qas['answers']
+            #
+            #     if not answerList==[]:
+            #         answerText = answerList[0]['text'].lower()
+            #         print(paragraphText.find(answerText))
+            #
+            #
+
+meanL = np.mean(dataList)
+maxL = max(dataList)
+minL = min(dataList)
+dataList.sort()
+numOver = len(dataList[dataList.index(400):])
+
+print(f'Mean: {meanL}, Max: {maxL}, Min: {minL}, Num: {numOver}')
+
+
+
+
+
+
+
+
+
+
+dataList = []
+with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
 
