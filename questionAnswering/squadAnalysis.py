@@ -32,7 +32,7 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
                 answerStart, answerEnd = i, (i + answerLen)
     paragraphTargets = [1 if i in range(answerStart, answerEnd) else 0
                         for i in range(len(paragraphTokens))]
-    return ([0 for _ in range(len(answerTokens))] + paragraphTargets)
+    return ([0 for _ in range(len(questionTokens))] + paragraphTargets)
 
 
 with open('data/inData/train-v2.0.json') as squadFile:
@@ -61,6 +61,9 @@ with open('data/inData/train-v2.0.json') as squadFile:
                     answerTokens = word_tokenize(answerText)
                     targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
 
+                featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+                print(len(targetList))
+                print(featureArray.shape)
 
 
 
