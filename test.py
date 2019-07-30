@@ -3,7 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from bert_serving.client import BertClient
 
+bc = BertClient(check_length=True)
 
 torch.manual_seed(1)
 
@@ -14,7 +16,7 @@ def prepare_sequence(seq, to_ix):
 training_data = [
     ("How are you? I am well".lower().split(), [0,0,0,0,0,1]),
     ("Who are you? I am me".lower().split(), [0,0,0,0,0,1]),
-    ("What are you? I am me".lower().split(), [0,0,0, 1,1,0])
+    ("What are you? I am me".lower().split(), [0,0,0,1,1,0])
 ]
 
 word_to_ix = {}
@@ -40,7 +42,6 @@ class LSTMTagger(nn.Module):
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
         print(self.word_embeddings)
-
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
