@@ -35,6 +35,7 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
     return ([0 for _ in range(len(questionTokens))] + paragraphTargets)
 
 
+dataList = []
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
@@ -62,8 +63,10 @@ with open('data/inData/train-v2.0.json') as squadFile:
                     targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
 
                 featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
-                print(len(targetList))
-                print(featureArray.shape)
+
+                dataList.append({'features':featureArray, 'targets':targetList})
+                print(len(dataList))
+
 
 
 
