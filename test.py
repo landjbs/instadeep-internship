@@ -7,21 +7,28 @@
 
 import re
 import numpy as np
-import matplotlib.pyplot as plt
+from functools import reduce
 from bert_serving.client import BertClient
 from scipy.spatial.distance import cosine
+
 bc = BertClient(check_length=False)
 
 def get_word_encodings(text):
     """
-    Returns ordered list of tuples mapping words to vec embedding in context of
-    their sentence. Can handle text of any length, but sentences over 23 words
-    long will have their ends ignored.
+    Returns ordered list of word vec embeddings in context of their sentence.
+    Can handle text of any length, but sentences over 25 words long will
+    be split in two.
     Does not include CLS or SEP tokens but does include punctuation.
     """
     sentences = re.split(r'(?<=[\.\!\?])[^a-zA-Z0-9]+', text)
     sentenceVecs = bc.encode(sentences)
-    print(len(sentenceVecs))
+    textVecs =
+    print(textVecs)
+    # for sentence in sentences:
+    #     sentenceWords = sentence.split()
+    #     print(sentenceWords)
+    #     for i, wordVec in enumerate(sentenceVecs):
+    #         word = sentenceWords[i]
 
 
 while True:
