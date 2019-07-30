@@ -5,11 +5,6 @@ from tqdm import tqdm
 from vectorizers.docVecs import get_word_encodings
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-def clean_text(text):
-    decimalSub = re.sub(r'(?<=.)\.(?=.)', ',', text)
-    return re.sub(r'e.g.', "", decimalSub)
-
-
 answerMetrics = []
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
