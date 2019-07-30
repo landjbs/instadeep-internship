@@ -9,9 +9,6 @@ bc = BertClient(check_length=True)
 
 torch.manual_seed(1)
 
-def prepare_sequence(seq, to_ix):
-    idxs = [to_ix[w] for w in seq]
-    return torch.tensor(idxs, dtype=torch.long)
 
 training_data = [
     ("How are you? I am well".lower().split(), [0,0,0,0,0,1]),
@@ -79,9 +76,11 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
         # Step 2. Get our inputs ready for the network, that is, turn them into
         # Tensors of word indices.
-        sentence_in = prepare_sequence(sentence, word_to_ix)
+        # sentence_in = prepare_sequence(sentence, word_to_ix)
+        sentence_in = sentence
 
-        targets = prepare_sequence(tags, tag_to_ix)
+        # targets = prepare_sequence(tags, tag_to_ix)
+        targets = tags
 
         # Step 3. Run our forward pass.
         tag_scores = model(sentence_in)
