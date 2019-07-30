@@ -11,17 +11,16 @@ torch.manual_seed(1)
 
 
 training_data = [
-    ("How are you? I am well".lower().split(), [0,0,0,0,0,1]),
-    ("Who are you? I am me".lower().split(), [0,0,0,0,0,1]),
-    ("What are you? I am me".lower().split(), [0,0,0,1,1,0])
+    ("How are you? I am well".lower(), [0,0,0,0,0,1]),
+    ("Who are you? I am me".lower(), [0,0,0,0,0,1]),
+    ("What are you? I am me".lower(), [0,0,0,1,1,0])
 ]
 
-word_to_ix = {}
-for sent, tags in training_data:
-    for word in sent:
-        if word not in word_to_ix:
-            word_to_ix[word] = len(word_to_ix)
-print(word_to_ix)
+for dataPoint in training_data:
+    sentenceList =
+
+training_data = list(map(vectorize_train_data, training_data))
+print(training_data)
 
 tag_to_ix = {0: 0, 1: 1}
 
