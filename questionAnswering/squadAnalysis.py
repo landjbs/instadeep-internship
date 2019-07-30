@@ -53,3 +53,7 @@ with open('data/inData/train-v2.0.json') as squadFile:
                     answerText = answerList[0]['text'].lower()
                     answerWords = word_tokenize(answerText)
                     answerLen = len(answerWords)
+                    print(answerText)
+                    for row in wordEmbeddings:
+                        if row[0] in answerWords:
+                            print(row[0])
