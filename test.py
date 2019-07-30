@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import matplotlib.pyplot as plt
 
 torch.manual_seed(1)
 
@@ -95,3 +96,5 @@ with torch.no_grad():
     # 1 is the index of maximum value of row 2, etc.
     # Which is DET NOUN VERB DET NOUN, the correct sequence!
     print(f"{'-'*40}\n{tag_scores}\n{'-'*40}")
+    plt.imshow(tag_scores)
+    plt.show()
