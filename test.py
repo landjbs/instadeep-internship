@@ -94,4 +94,4 @@ with torch.no_grad():
     # since 0 is index of the maximum value of row 1,
     # 1 is the index of maximum value of row 2, etc.
     # Which is DET NOUN VERB DET NOUN, the correct sequence!
-    print(tag_scores)
+    print(f"{'-'*40}\n{tag_scores}\n{'-'*40}")
