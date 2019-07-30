@@ -10,17 +10,19 @@ bc = BertClient(check_length=True)
 torch.manual_seed(1)
 
 
-training_data = [
+raw_data = [
     ("How are you? I am well".lower(), [0,0,0,0,0,1]),
     ("Who are you? I am me".lower(), [0,0,0,0,0,1]),
     ("What are you? I am me".lower(), [0,0,0,1,1,0])
 ]
 
-for dataPoint in training_data:
-    sentenceList =
+training_data = []
 
-training_data = list(map(vectorize_train_data, training_data))
-print(training_data)
+for dataPoint in raw_data:
+    sentence = dataPoint[0]
+    sentenceVec = [num for num in bc.encode([sentence])[0][1]]
+    training_data.append((torch.tensor(sentenceVec), dataPoint[1]))
+
 
 tag_to_ix = {0: 0, 1: 1}
 
@@ -37,7 +39,7 @@ class LSTMTagger(nn.Module):
         self.hidden_dim = hidden_dim
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
-        print(self.word_embeddings)
+        # print(self.word_embeddings)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -54,7 +56,7 @@ class LSTMTagger(nn.Module):
         return tag_scores
 
 
-model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
+model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, 1024, len(tag_to_ix))
 
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
