@@ -18,6 +18,18 @@ def filter_text_vec(textVec):
     return np.array([wordVec for wordVec in textVec if not (wordVec[0]==0)])
 
 
+def make_target_list(answerTokens, paragraphTokens, questionTokens):
+    """
+    Makes a list of targets for training where answer tokens have score of
+    1 and everything else (including the question tokens) have score of 0
+    """
+    answerLen = len(answerTokens)
+    firstAnswerWord = answerTokens[0]
+    for i, word in enumerate(paragraphTokens):
+        if (word == firstAnswerWord):
+            
+
+
 with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
@@ -30,20 +42,20 @@ with open('data/inData/train-v2.0.json') as squadFile:
             paragraphArray = filter_text_vec(paragraphVec)
 
             for qas in paragraph['qas']:
-                # convert question into filtered list of conxtual word vecs
+                # convert question into filtered array of conxtual word vecs
                 question = qas['question'].lower()
                 print(question)
                 questionTokens = word_tokenize(question)
                 questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
                 questionArray = filter_text_vec(questionVec)
 
-                print(questionVec)
-
                 answerList = qas['answers']
 
                 if not answerList==[]:
                     answerText = answerList[0]['text'].lower()
-                    print(paragraphText.find(answerText))
+                    answerTokens = word_tokenize(answerText)
+                    print(f'\t{answerTokens}')
+
 
 
 
