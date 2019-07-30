@@ -4,6 +4,9 @@ import numpy as np
 from tqdm import tqdm
 from vectorizers.docVecs import get_word_encodings
 from nltk.tokenize import word_tokenize, sent_tokenize
+from bert_serving.client import BertClient
+
+bc = BertClient(check_length=True)
 
 answerMetrics = []
 with open('data/inData/train-v2.0.json') as squadFile:
@@ -11,9 +14,17 @@ with open('data/inData/train-v2.0.json') as squadFile:
         print(f"Category: {categorty['title']}")
         for paragraph in (categorty['paragraphs']):
             paragraphText = paragraph['context'].lower()
+
             # paragraphEmbeddings = get_word_encodings(paragraphText)
-            paragraphWords = word_tokenize(paragraphText)
-            print(paragraphWords)
+            # paragraphWords = word_tokenize(paragraphText)
+
+            sentences = sent_tokenize(paragraphText)
+            tokenizedSents = [word_tokenize(sent) for sent in sentences]
+            sentVecs = bc.encode(tokenizedSents, is_tokenized=True)
+            for wordVecs in sentVecs:
+                for wordVec in wordVecs:
+                    if not wordVec[0]
+
             for qas in paragraph['qas']:
                 question = qas['question'].lower()
                 answerList = qas['answers']
@@ -24,4 +35,3 @@ with open('data/inData/train-v2.0.json') as squadFile:
                     answerText = answerList[0]['text'].lower()
                     answerStart = answerList[0]['answer_start']
                     answerSpan = (answerStart, (answerStart + (len(answerText))))
-                    print(answerText, answerSpan)
