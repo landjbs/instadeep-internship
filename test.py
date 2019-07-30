@@ -4,9 +4,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 import matplotlib.pyplot as plt
 
-from bert_serving.client import BertClient
-
-bc = BertClient(check_length=True)
 
 torch.manual_seed(1)
 
@@ -24,7 +21,7 @@ word_to_ix = {}
 for sent, tags in training_data:
     for word in sent:
         if word not in word_to_ix:
-            word_to_ix[word] = bc.encode([word])[0][1]
+            word_to_ix[word] = len(word_to_ix)
 print(word_to_ix)
 
 tag_to_ix = {0: 0, 1: 1}
@@ -42,6 +39,8 @@ class LSTMTagger(nn.Module):
         self.hidden_dim = hidden_dim
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+        print(self.word_embeddings)
+
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -59,16 +58,17 @@ class LSTMTagger(nn.Module):
 
 
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
+
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
 # See what the scores are before training
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
-with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
-    tag_scores = model(inputs)
-    print(tag_scores)
+# with torch.no_grad():
+#     inputs = prepare_sequence(training_data[0][0], word_to_ix)
+#     tag_scores = model(inputs)
+#     print(tag_scores)
 
 for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
     for sentence, tags in training_data:
@@ -79,6 +79,7 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         # Step 2. Get our inputs ready for the network, that is, turn them into
         # Tensors of word indices.
         sentence_in = prepare_sequence(sentence, word_to_ix)
+
         targets = prepare_sequence(tags, tag_to_ix)
 
         # Step 3. Run our forward pass.
@@ -90,17 +91,20 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
         loss.backward()
         optimizer.step()
 
-# See what the scores are after training
-with torch.no_grad():
-    inputs = prepare_sequence(('what are you? i am me').split(), word_to_ix) # training_data[0][0]
-    tag_scores = model(inputs)
 
-    # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
-    # for word i. The predicted tag is the maximum scoring tag.
-    # Here, we can see the predicted sequence below is 0 1 2 0 1
-    # since 0 is index of the maximum value of row 1,
-    # 1 is the index of maximum value of row 2, etc.
-    # Which is DET NOUN VERB DET NOUN, the correct sequence!
-    print(f"{'-'*40}\n{tag_scores}\n{'-'*40}")
-    plt.imshow(tag_scores)
-    plt.show()
+
+
+# See what the scores are after training
+# with torch.no_grad():
+#     inputs = prepare_sequence(('what are you? i am me').split(), word_to_ix) # training_data[0][0]
+#     tag_scores = model(inputs)
+#
+#     # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
+#     # for word i. The predicted tag is the maximum scoring tag.
+#     # Here, we can see the predicted sequence below is 0 1 2 0 1
+#     # since 0 is index of the maximum value of row 1,
+#     # 1 is the index of maximum value of row 2, etc.
+#     # Which is DET NOUN VERB DET NOUN, the correct sequence!
+#     print(f"{'-'*40}\n{tag_scores}\n{'-'*40}")
+#     plt.imshow(tag_scores)
+#     plt.show()
