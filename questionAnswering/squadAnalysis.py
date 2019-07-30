@@ -20,31 +20,35 @@ with open('data/inData/train-v2.0.json') as squadFile:
             tokenizedSents = [word_tokenize(sent) for sent in sentences]
             sentVecs = bc.encode(tokenizedSents, is_tokenized=True)
 
+            wordEmbeddings = []
             for sentNum, wordVecs in enumerate(sentVecs):
                 for wordNum, wordVec in enumerate(wordVecs):
                     if not (wordVec[0]==0):
                         curWord = tokenizedSents[sentNum][wordNum-1]
-                        wordEmbeddings.append((curWord, wordVec))
+                        wordEmbeddings.append([curWord] + [scalar for scalar in wordVec])
 
             wordEmbeddings = np.array(wordEmbeddings)
 
-            # scoring (wordVec, inAnswerSpan)
+            # scoring [inAnswerSpan, wordVec dims-->]
             for qas in paragraph['qas']:
                 question = re.sub("\\?", "", qas['question'].lower())
                 questionWords = word_tokenize(question)
-                questionEmbeddings = np.array([(0, wordVec) for wordVec
-                                        in bc.encode([questionWords], is_tokenized=True)[0]
-                                        if not (wordVec[0]==0)])
+                wordVecs = bc.encode([questionWords], is_tokenized=True)[0]
+                questionEmbeddings = []
+                for wordVec in wordVecs:
+                    if not wordVec[0]==0:
+                        questionEmbeddings.append([0] + [scalar for scalar in wordVec])
 
-                wordEmbeddings[:, 0] = np.zeros(wordEmbeddings.shape[0])
-                print(wordEmbeddings.shape)
-                data = np.concatenate(questionEmbeddings, wordEmbeddings)
-                print(data)
+                questionEmbeddings = np.array(questionEmbeddings)
+
+                data = np.concatenate((questionEmbeddings, wordEmbeddings), axis=0)
+                print(f"Data: {data.shape}")
 
                 # print(f'questionVec: {len(questionVec)}')
                 answerList = qas['answers']
                 if answerList==[]:
                     answerTokens = None
+                    wordEmbeddings[:, 0] = np.zeros(wordEmbeddings.shape[0])
                 else:
                     answerText = answerList[0]['text'].lower()
                     answerWords = word_tokenize(answerText)
