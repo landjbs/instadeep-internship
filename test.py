@@ -3,20 +3,15 @@
 # x = build_question_database(PATH, n=2500, outPath='data/outData/paragraphFindingDf.sav')
 
 
-import questionAnswering.squadAnalysis
+# import questionAnswering.squadAnalysis
 
-# from bert_serving.client import BertClient
-# from scipy.spatial.distance import cosine
-#
-# bc = BertClient(check_length=False)
-#
-#
-# while True:
-#     s = input("s: ")
-#     print(get_word_encodings(s))
-    # sVec = bc.encode([s])
-    # sWords = ['CLS'] + s.split() + ['SEP']
-    # for i, wordVec in enumerate(sVec[0]):
-    #     if not wordVec[0]==0:
-    #         print(sWords[i], wordVec)
-    #         print(np.sum(wordVec))
+from bert_serving.client import BertClient
+from scipy.spatial.distance import cosine
+from vectorizers.docVecs import get_word_encodings
+
+bc = BertClient(check_length=False)
+
+
+while True:
+    s = input("s: ")
+    print(len(get_word_encodings(s)))
