@@ -18,6 +18,7 @@ raw_data = [
 
 training_data = []
 
+#### CURRENTLY TAKES FIRST WORD VECTOR FOR TESTING———NEEDS UPDATE #####
 for dataPoint in raw_data:
     sentence = dataPoint[0]
     sentenceVec = [num for num in bc.encode([sentence])[0][1]]
@@ -25,6 +26,7 @@ for dataPoint in raw_data:
 
 
 tag_to_ix = {0: 0, 1: 1}
+
 
 # These will usually be more like 32 or 64 dimensional.
 # We will keep them small, so we can see how the weights change as we train.
@@ -39,6 +41,7 @@ class LSTMTagger(nn.Module):
         self.hidden_dim = hidden_dim
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+
         # print(self.word_embeddings)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
