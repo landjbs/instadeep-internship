@@ -21,11 +21,13 @@ with open('data/inData/train-v2.0.json') as squadFile:
             sentVecs = bc.encode(tokenizedSents, is_tokenized=True)
 
             wordEmbeddings = []
+            wordList = []
             for sentNum, wordVecs in enumerate(sentVecs):
                 for wordNum, wordVec in enumerate(wordVecs):
                     if not (wordVec[0]==0):
                         curWord = tokenizedSents[sentNum][wordNum-1]
-                        wordEmbeddings.append([curWord] + [scalar for scalar in wordVec])
+                        wordEmbeddings.append([0] + [scalar for scalar in wordVec])
+                        wordList.append(curWord)
 
             wordEmbeddings = np.array(wordEmbeddings)
 
@@ -54,6 +56,16 @@ with open('data/inData/train-v2.0.json') as squadFile:
                     answerWords = word_tokenize(answerText)
                     answerLen = len(answerWords)
                     print(answerText)
-                    for row in wordEmbeddings:
-                        if row[0] in answerWords:
-                            print(row[0])
+
+                    for i, word in enumerate(wordList):
+                        if word==answerWords[0]:
+                            if all((nextWord in answerWords) for nextWord
+                                    in wordList[i:i+answerLen]):
+                                wordEmbeddings[i:i+answerLen, 0] = [1 for _ in range(answerLen)]
+
+                    print(wordEmbeddings[:,0])
+                    # for rowNum, rowVals in enumerate(wordEmbeddings):
+                    #     if rowVals[0]==answerWords[0]:
+                    #         if all((word in answerWords)
+                    #                 for word in wordEmbeddings[rowNum:(rowNum+answerLen), 0]):
+                    #             wordEmbeddings[rowNum:(rowNum+answerLen), 0] = np.zeros(answerLen)
