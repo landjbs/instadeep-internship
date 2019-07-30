@@ -1,6 +1,7 @@
 import re
 import json
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from vectorizers.docVecs import get_word_encodings
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -8,7 +9,7 @@ from bert_serving.client import BertClient
 
 bc = BertClient(check_length=True)
 
-dataList = []
+MAX_LEN = 490
 
 def filter_text_vec(textVec):
     """
@@ -41,28 +42,38 @@ with open('data/inData/train-v2.0.json') as squadFile:
         print(f"Category: {categorty['title']}")
 
         for paragraph in categorty['paragraphs']:
-            # convert paragraph into filtered array of contextual word vecs
-            paragraphText = paragraph['context'].lower()
-            paragraphTokens = word_tokenize(paragraphText)
-            paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
-            paragraphArray = filter_text_vec(paragraphVec)
+            try:
+                # convert paragraph into filtered array of contextual word vecs
+                paragraphText = paragraph['context'].lower()
+                paragraphTokens = word_tokenize(paragraphText)
 
-            for qas in paragraph['qas']:
-                # convert question into filtered array of conxtual word vecs
-                question = qas['question'].lower()
-                print(question)
-                questionTokens = word_tokenize(question)
-                questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
-                questionArray = filter_text_vec(questionVec)
+                assert (len(paragraphTokens)>=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens— cannot be more than {MAX_LEN}."
 
-                answerList = qas['answers']
+                paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
+                paragraphArray = filter_text_vec(paragraphVec)
 
-                if not answerList==[]:
-                    answerText = answerList[0]['text'].lower()
-                    answerTokens = word_tokenize(answerText)
-                    targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
+                for qas in paragraph['qas']:
+                    # convert question into filtered array of conxtual word vecs
+                    question = qas['question'].lower()
+                    questionTokens = word_tokenize(question)
+                    questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
+                    questionArray = filter_text_vec(questionVec)
 
-                featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+                    answerList = qas['answers']
 
-                dataList.append({'features':featureArray, 'targets':targetList})
-                print(len(dataList))
+                    if not answerList==[]:
+                        answerText = answerList[0]['text'].lower()
+                        answerTokens = word_tokenize(answerText)
+                        targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
+                    else:
+                        targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
+
+                    featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+
+                    dataList.append({'features':featureArray, 'targets':targetList})
+            except:
+                pass
+
+dataframe = pd.DataFrame(dataList)
+
+dataframe.to_pickle('data/outData/squadDataFrame.sav')
