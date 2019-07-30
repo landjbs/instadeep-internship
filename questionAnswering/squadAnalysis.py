@@ -27,6 +27,7 @@ with open('data/inData/train-v2.0.json') as squadFile:
 
             for qas in paragraph['qas']:
                 question = qas['question'].lower()
+                questionVec = bc.encode([question])[0]
                 answerList = qas['answers']
                 if answerList==[]:
                     answerTokens = None
