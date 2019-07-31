@@ -1,5 +1,10 @@
+import pandas as pd
 
-import questionAnswering.squadAnalysis
+df = pd.read_csv('data/outData/squadDataBACKUP.sav')
+
+print(df)
+
+# import questionAnswering.squadAnalysis
 
 
 
