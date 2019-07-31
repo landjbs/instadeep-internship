@@ -53,7 +53,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
 
     dataList = []
     with open(squadPath) as squadFile:
-        print(f"{'-'*80}[ Analyzing SQuAD Dataset ]{'-'*80}")
+        print(f"{'-'*30}[ Analyzing SQuAD Dataset ]{'-'*30}")
         for categorty in tqdm(json.load(squadFile)['data']):
             # print(f"Category: {categorty['title']}")
 
@@ -93,7 +93,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                             else:
                                 targetList = [0 for _ in range(questionArray.shape[0] + paragraphArray.shape[0])]
 
-                            featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+                            featureArray = np.concatenate([questionArray, paragraphArray], axis=0)
 
                             dataList.append({'features':featureArray, 'targets':targetList})
                         except:

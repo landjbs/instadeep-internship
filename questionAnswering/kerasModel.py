@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
 
 
-def train_answering_lstm(filePath, outPath=None):
+def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
     """
     Trains bidirectional LSTM model on dataframe of feature arrays and
     target vectors in dataframe pickled at filePath.
@@ -17,7 +17,9 @@ def train_answering_lstm(filePath, outPath=None):
     """
 
     # read and split the dataframe
-    dataframe = pd.read_pickle(filePath)
+    if not dataframe:
+        dataframe = pd.read_pickle(filePath)
+
     features, targets = dataframe['features'], dataframe['targets']
 
     # reshape the feature and target arrays
@@ -29,11 +31,13 @@ def train_answering_lstm(filePath, outPath=None):
     # plt.ylabel('Number of Times in Span')
     # plt.show()
 
+    print(featureArray.shape)
+
     # model architecture
     model = Sequential()
     model.add(Bidirectional(LSTM(40, return_sequences=True),
-                                    input_shape=(featureArray.shape[1],
-                                                featureArray.shape[2])))
+                                input_shape=(featureArray.shape[1],
+                                            featureArray.shape[2])))
     model.add(Bidirectional(LSTM(40)))
     model.add(Dense(5))
     model.add(Activation('softmax'))
@@ -49,7 +53,6 @@ def train_answering_lstm(filePath, outPath=None):
     model.add(Dense(targetArray.shape[1]))
     model.add(Activation('softmax'))
     model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-
 
     # model training
     model.fit(featureArray, targetArray, epochs=10)
