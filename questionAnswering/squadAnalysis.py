@@ -11,12 +11,14 @@ bc = BertClient(check_length=True)
 
 MAX_LEN = 390
 
-def filter_text_vec(textVec):
+def filter_text_vec(textVec, numWords):
     """
-    filters out empty vectors of buffer words in text vec
-    and returns np.array of shape (numWords, numDims)
+    Returns np.array of shape (numWords, numDims)
+        -textVec:   the contextual vector of each word in the text
+        -numWords:  the number of word vectors allowed in the final array
     """
-    return np.array([wordVec for wordVec in textVec if not (wordVec[0]==0)])
+    return np.array([wordVec for i, wordVec in enumerate(textVec)
+                    if i <= numWords])
 
 
 def make_target_list(answerTokens, paragraphTokens, questionTokens):
