@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from functools import reduce
+import matplotlib.pyplot as plt
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
@@ -23,12 +24,15 @@ def train_answering_lstm(filePath, outPath=None):
     featureArray = np.array([feature for feature in features])
     targetArray = np.array([np.array(target) for target in targets])
 
+    # plt.plot(np.sum(targetArray, axis=0))
+    # plt.show()
+
     # model architecture
     model = Sequential()
-    model.add(Bidirectional(LSTM(400, return_sequences=True),
+    model.add(Bidirectional(LSTM(40, return_sequences=True),
                                     input_shape=(featureArray.shape[1],
                                                 featureArray.shape[2])))
-    model.add(Bidirectional(LSTM(400)))
+    model.add(Bidirectional(LSTM(40)))
     model.add(Dense(5))
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
@@ -43,10 +47,11 @@ def train_answering_lstm(filePath, outPath=None):
 
     model.add(Dense(targetArray.shape[1]))
     model.add(Activation('softmax'))
-    model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+    model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+
 
     # model training
-    model.fit(featureArray, targetArray)
+    model.fit(featureArray, targetArray, epochs=10)
 
     if outPath:
         model.save(outPath)

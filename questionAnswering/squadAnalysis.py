@@ -53,10 +53,10 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
 
     dataList = []
     with open(squadPath) as squadFile:
-        for categorty in json.load(squadFile)['data']:
-            print(f"Category: {categorty['title']}")
+        for categorty in tqdm(json.load(squadFile)['data']):
+            # print(f"Category: {categorty['title']}")
 
-            for i, paragraph in enumerate(tqdm(categorty['paragraphs'])):
+            for i, paragraph in enumerate(tqdm(categorty['paragraphs'], leave=False, ncols=120)):
                 try:
                     assert (i < paraDepth), f"Paragraph Num Exceeded at paragraph number {i}."
 
@@ -69,10 +69,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                     paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
                     paragraphArray = filter_text_vec(paragraphVec, paraMax)
 
-                    # for j, qas in enumerate(tqdm(paragraph['qas'], leave=False, ncols=70)):
-                    for j, qas in enumerate((paragraph['qas'])):
-                        assert (j < paraDepth), 'para depth'
-
+                    for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
                         try:
                             # convert question into filtered array of conxtual word vecs
                             question = qas['question'].lower()
@@ -98,8 +95,8 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                             featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
 
                             dataList.append({'features':featureArray, 'targets':targetList})
-                        except Exception as e:
-                            print(e)
+                        except:
+                            pass
                 except:
                     pass
 
