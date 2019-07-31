@@ -17,7 +17,7 @@ def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
     """
 
     # read and split the dataframe
-    if not dataframe:
+    if (dataframe == None):
         dataframe = pd.read_pickle(filePath, compression='gzip')
 
     features, targets = dataframe['features'], dataframe['targets']

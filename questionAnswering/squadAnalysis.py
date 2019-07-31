@@ -55,7 +55,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     with open(squadPath) as squadFile:
         print(f"{'-'*30}[ Analyzing SQuAD Dataset ]{'-'*30}")
         # for categorty in tqdm(json.load(squadFile)['data']):
-        for categorty in enumerate(json.load(squadFile)['data']):
+        for nz, categorty in enumerate(json.load(squadFile)['data']):
             if nz > 2:
                 break
             # print(f"Category: {categorty['title']}")
@@ -110,6 +110,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     if picklePath:
         try:
             dataframe.to_pickle(picklePath, compression='gzip')
+            print(f'Pickled to "{picklePath}"')
         except Exception as e:
             print(f'PICKLE ERROR: {e}')
     if csvPath:
