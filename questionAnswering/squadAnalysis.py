@@ -36,7 +36,7 @@ def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
     return ([0 for _ in range(questionLen)] + paragraphTargets)
 
 
-def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, picklePath=None, csvPath=None):
+def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, picklePath=None, csvPath=None):
     """
     Reads SQuAD dataset from json file into LSTM-ready dataframe mapping a
     feature array of the contextual embedding of each token in a text with
