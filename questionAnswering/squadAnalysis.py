@@ -10,6 +10,32 @@ from bert_serving.client import BertClient
 bc = BertClient(check_length=True)
 
 
+def filter_text_vec(textVec, numWords):
+    """
+    Returns np.array of shape (numWords, numDims)
+        -textVec:   the contextual vector of each word in the text
+        -numWords:  the number of word vectors allowed in the final array
+    """
+    return np.array([wordVec for i, wordVec in enumerate(textVec)
+                    if i <= numWords])
+
+def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
+    """
+    Makes a list of targets for training where answer tokens have score of
+    1 and everything else (including the question tokens) have score of 0
+    """
+    answerLen = len(answerTokens)
+    firstAnswerWord = answerTokens[0]
+    for i, word in enumerate(paragraphTokens):
+        if (word == firstAnswerWord):
+            if all((word in answerTokens) for word
+                    in paragraphTokens[i : (i + answerLen)]):
+                answerStart, answerEnd = i, (i + answerLen)
+    paragraphTargets = [1 if i in range(answerStart, answerEnd) else 0
+                        for i in range(paraLen)]
+    return ([0 for _ in range(questionLen)] + paragraphTargets)
+
+
 def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, picklePath=None, csvPath=None):
     """
     Reads SQuAD dataset from json file into LSTM-ready dataframe mapping a
@@ -24,32 +50,6 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
         -picklePath:    Path to which to save the final dataframe as pickle
         -csvPath:       Path to which to save the final dataframe as csv (backup)
     """
-
-    def filter_text_vec(textVec, numWords):
-        """
-        Returns np.array of shape (numWords, numDims)
-            -textVec:   the contextual vector of each word in the text
-            -numWords:  the number of word vectors allowed in the final array
-        """
-        return np.array([wordVec for i, wordVec in enumerate(textVec)
-                        if i <= numWords])
-
-    def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
-        """
-        Makes a list of targets for training where answer tokens have score of
-        1 and everything else (including the question tokens) have score of 0
-        """
-        answerLen = len(answerTokens)
-        firstAnswerWord = answerTokens[0]
-        for i, word in enumerate(paragraphTokens):
-            if (word == firstAnswerWord):
-                if all((word in answerTokens) for word
-                        in paragraphTokens[i : (i + answerLen)]):
-                    answerStart, answerEnd = i, (i + answerLen)
-        paragraphTargets = [1 if i in range(answerStart, answerEnd) else 0
-                            for i in range(paraLen)]
-        return ([0 for _ in range(questionLen)] + paragraphTargets)
-
 
     dataList = []
     with open(squadPath) as squadFile:
