@@ -34,8 +34,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
         return np.array([wordVec for i, wordVec in enumerate(textVec)
                         if i <= numWords])
 
-
-    def make_target_list(answerTokens, paragraphTokens, questionTokens):
+    def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
         """
         Makes a list of targets for training where answer tokens have score of
         1 and everything else (including the question tokens) have score of 0
@@ -48,9 +47,9 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
                         in paragraphTokens[i : (i + answerLen)]):
                     answerStart, answerEnd = i, (i + answerLen)
         paragraphTargets = [1 if i in range(answerStart, answerEnd) else 0
-                            for i in range(paraMax)]
-        return ([0 for _ in range(questionMax)] + paragraphTargets)
-        
+                            for i in range(paraLen)]
+        return ([0 for _ in range(questionLen)] + paragraphTargets)
+
 
     dataList = []
     with open(squadPath) as squadFile:
@@ -88,15 +87,25 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
                             if not answerList==[]:
                                 answerText = answerList[0]['text'].lower()
                                 answerTokens = word_tokenize(answerText)
-                                targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
+                                targetList = make_target_list(answerTokens,
+                                                            paragraphTokens,
+                                                            questionArray.shape[0],
+                                                            paragraphArray.shape[0])
                             else:
-                                targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
+                                targetList = [0 for _ in range(questionArray.shape[0] + paragraphArray.shape[0]))]
 
                             featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
 
+                            print(len(targetList))
+
+                            for i, s in enumerate(targetList):
+                                print(s)
+                                if s == 1:
+                                    print(wordList[i])
+
                             dataList.append({'features':featureArray, 'targets':targetList})
-                        except:
-                            pass
+                        except Exception as e:
+                            print(e)
                 except:
                     pass
 
