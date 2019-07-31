@@ -35,53 +35,69 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
                         for i in range(len(paragraphTokens))]
     return ([0 for _ in range(len(questionTokens))] + paragraphTargets)
 
+'data/inData/train-v2.0.json'
+'data/outData/squadDataFrame.sav'
 
-dataList = []
-with open('data/inData/train-v2.0.json') as squadFile:
-    for categorty in json.load(squadFile)['data']:
-        print(f"Category: {categorty['title']}")
+def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
+    """
+    Reads SQuAD dataset from json file into LSTM-ready dataframe mapping a
+    feature array of the contextual embedding of each token in a text with
+    the embedding of each token in a question concatenated to the front and
+    a target array of len=features.shape[0] where tokens within the answer
+    span of the question have a 1 and the rest have a 0.
+        -squadPath:     File from which to read the squad data
+        -paraDepth:     Number of questions from each paragraph to analyze
+        -picklePath:    Path to which to save the final dataframe as pickle
+        -csvPath:       Path to which to save the final dataframe as csv (backup)
+    """
+    dataList = []
+    with open() as squadFile:
+        for categorty in json.load(squadFile)['data']:
+            print(f"Category: {categorty['title']}")
 
-        for i, paragraph in enumerate(tqdm(categorty['paragraphs'])):
-            try:
-                assert (i<2), f"Paragraph Num Exceeded at paragraph number {i}."
+            for i, paragraph in enumerate(tqdm(categorty['paragraphs'])):
+                try:
+                    assert (i<2), f"Paragraph Num Exceeded at paragraph number {i}."
 
-                # convert paragraph into filtered array of contextual word vecs
-                paragraphText = paragraph['context'].lower()
-                paragraphTokens = word_tokenize(paragraphText)
+                    # convert paragraph into filtered array of contextual word vecs
+                    paragraphText = paragraph['context'].lower()
+                    paragraphTokens = word_tokenize(paragraphText)
 
-                assert (len(paragraphTokens)<=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens; cannot be more than {MAX_LEN}."
+                    assert (len(paragraphTokens)<=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens; cannot be more than {MAX_LEN}."
 
-                paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
-                paragraphArray = filter_text_vec(paragraphVec)
+                    paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
+                    paragraphArray = filter_text_vec(paragraphVec)
 
-                for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
-                    # convert question into filtered array of conxtual word vecs
-                    question = qas['question'].lower()
-                    questionTokens = word_tokenize(question)
-                    questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
-                    questionArray = filter_text_vec(questionVec)
+                    for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
+                        # convert question into filtered array of conxtual word vecs
+                        question = qas['question'].lower()
+                        questionTokens = word_tokenize(question)
+                        questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
+                        questionArray = filter_text_vec(questionVec)
 
-                    answerList = qas['answers']
+                        answerList = qas['answers']
 
-                    if not answerList==[]:
-                        answerText = answerList[0]['text'].lower()
-                        answerTokens = word_tokenize(answerText)
-                        targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
-                    else:
-                        targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
+                        if not answerList==[]:
+                            answerText = answerList[0]['text'].lower()
+                            answerTokens = word_tokenize(answerText)
+                            targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
+                        else:
+                            targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
 
-                    featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+                        featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
 
-                    dataList.append({'features':featureArray, 'targets':targetList})
-            except:
-                pass
+                        dataList.append({'features':featureArray, 'targets':targetList})
+                except:
+                    pass
 
-dataframe = pd.DataFrame(dataList)
-try:
-    dataframe.to_pickle('data/outData/squadDataFrame.sav')
-except Exception as e:
-    print(f'PICKLE: {e}')
-try:
-    dataframe.to_csv('data/outData/squadDataBACKUP.sav')
-except Exception as e:
-    print(f'CSV: {e}')
+    dataframe = pd.DataFrame(dataList)
+
+    if outPath:
+        try:
+            dataframe.to_pickle(outPath)
+        except Exception as e:
+            print(f'PICKLE ERROR: {e}')
+        try:
+            dataframe.to_csv('data/outData/squadDataBACKUP.sav')
+        except Exception as e:
+            print(f'CSV ERROR: {e}')

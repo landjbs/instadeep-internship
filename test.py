@@ -4,9 +4,7 @@ df = pd.read_csv('data/outData/squadDataBACKUP.sav')
 
 print(df)
 
-# import questionAnswering.squadAnalysis
-
-
+import questionAnswering.squadAnalysis
 
 # from bert_serving.client import BertClient
 # from nltk.tokenize import word_tokenize
