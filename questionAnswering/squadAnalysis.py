@@ -90,11 +90,12 @@ def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
 
     dataframe = pd.DataFrame(dataList)
 
-    if outPath:
+    if picklePath:
         try:
             dataframe.to_pickle(picklePath)
         except Exception as e:
             print(f'PICKLE ERROR: {e}')
+    if csvPath:
         try:
             dataframe.to_csv(csvPath)
         except Exception as e:
