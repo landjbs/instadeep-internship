@@ -9,7 +9,6 @@ from bert_serving.client import BertClient
 
 bc = BertClient(check_length=True)
 
-MAX_LEN = 390
 
 def filter_text_vec(textVec, numWords):
     """
@@ -38,7 +37,7 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
     return ([0 for _ in range(len(questionTokens))] + paragraphTargets)
 
 
-def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
+def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, picklePath=None, csvPath=None):
     """
     Reads SQuAD dataset from json file into LSTM-ready dataframe mapping a
     feature array of the contextual embedding of each token in a text with
@@ -47,6 +46,8 @@ def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
     span of the question have a 1 and the rest have a 0.
         -squadPath:     File from which to read the squad data
         -paraDepth:     Number of questions from each paragraph to analyze
+        -paraMax:       Max number of tokens that a paragraph can have to be analyzed
+        -questionMax:   Max number of tokens that a question can have to be analyzed
         -picklePath:    Path to which to save the final dataframe as pickle
         -csvPath:       Path to which to save the final dataframe as csv (backup)
     """
@@ -63,35 +64,42 @@ def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
                     paragraphText = paragraph['context'].lower()
                     paragraphTokens = word_tokenize(paragraphText)
 
-                    assert (len(paragraphTokens)<=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens; cannot be more than {MAX_LEN}."
+                    assert (len(paragraphTokens)<=paraMax), f"Paragraph has {len(paragraphTokens)} tokens; cannot be more than {paraMax}."
 
                     paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
-                    paragraphArray = filter_text_vec(paragraphVec)
+                    paragraphArray = filter_text_vec(paragraphVec, paraMax)
 
                     for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
-                        # convert question into filtered array of conxtual word vecs
-                        question = qas['question'].lower()
-                        questionTokens = word_tokenize(question)
-                        questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
-                        questionArray = filter_text_vec(questionVec)
+                        try:
+                            # convert question into filtered array of conxtual word vecs
+                            question = qas['question'].lower()
+                            questionTokens = word_tokenize(question)
 
-                        answerList = qas['answers']
+                            assert (len(questionTokens)<=questionMax), f"Question has {len(questionTokens)} tokens; cannot be more than {questionMax}."
 
-                        if not answerList==[]:
-                            answerText = answerList[0]['text'].lower()
-                            answerTokens = word_tokenize(answerText)
-                            targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
-                        else:
-                            targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
+                            questionVec = bc.encode([questionTokens], is_tokenized=True)[0]
+                            questionArray = filter_text_vec(questionVec, questionMax)
 
-                        featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+                            answerList = qas['answers']
 
-                        dataList.append({'features':featureArray, 'targets':targetList})
+                            if not answerList==[]:
+                                answerText = answerList[0]['text'].lower()
+                                answerTokens = word_tokenize(answerText)
+                                targetList = make_target_list(answerTokens, paragraphTokens, questionTokens)
+                            else:
+                                targetList = [0 for _ in range(len(questionTokens) + len(paragraphTokens))]
+
+                            featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
+
+                            dataList.append({'features':featureArray, 'targets':targetList})
+                        except:
+                            pass
                 except:
                     pass
 
     dataframe = pd.DataFrame(dataList)
 
+    # save dataframe if prompted
     if picklePath:
         try:
             dataframe.to_pickle(picklePath)
