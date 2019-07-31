@@ -69,7 +69,8 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
                     paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
                     paragraphArray = filter_text_vec(paragraphVec, paraMax)
 
-                    for j, qas in enumerate(tqdm(paragraph['qas'], leave=False, ncols=70)):
+                    # for j, qas in enumerate(tqdm(paragraph['qas'], leave=False, ncols=70)):
+                    for j, qas in enumerate((paragraph['qas'])):
                         assert (j < paraDepth), 'para depth'
 
                         try:
@@ -92,16 +93,9 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=10, pick
                                                             questionArray.shape[0],
                                                             paragraphArray.shape[0])
                             else:
-                                targetList = [0 for _ in range(questionArray.shape[0] + paragraphArray.shape[0]))]
+                                targetList = [0 for _ in range(questionArray.shape[0] + paragraphArray.shape[0])]
 
                             featureArray = np.concatenate([paragraphArray, questionArray], axis=0)
-
-                            print(len(targetList))
-
-                            for i, s in enumerate(targetList):
-                                print(s)
-                                if s == 1:
-                                    print(wordList[i])
 
                             dataList.append({'features':featureArray, 'targets':targetList})
                         except Exception as e:
