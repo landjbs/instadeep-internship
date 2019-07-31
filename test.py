@@ -5,4 +5,6 @@
 #                     picklePath='data/outData/squadDataFrame.sav',
 #                     csvPath='data/outData/squadDataFrameBACKUP.csv')
 
-import questionAnswering.kerasModel
+from questionAnswering.kerasModel import train_answering_lstm
+
+train_answering_lstm('data/outData/squadDataFrame.sav')
