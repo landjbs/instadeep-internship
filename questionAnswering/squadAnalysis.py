@@ -35,8 +35,6 @@ def make_target_list(answerTokens, paragraphTokens, questionTokens):
                         for i in range(len(paragraphTokens))]
     return ([0 for _ in range(len(questionTokens))] + paragraphTargets)
 
-'data/inData/train-v2.0.json'
-'data/outData/squadDataFrame.sav'
 
 def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
     """
@@ -51,13 +49,13 @@ def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
         -csvPath:       Path to which to save the final dataframe as csv (backup)
     """
     dataList = []
-    with open() as squadFile:
+    with open(squadPath) as squadFile:
         for categorty in json.load(squadFile)['data']:
             print(f"Category: {categorty['title']}")
 
             for i, paragraph in enumerate(tqdm(categorty['paragraphs'])):
                 try:
-                    assert (i<2), f"Paragraph Num Exceeded at paragraph number {i}."
+                    assert (i < paraDepth), f"Paragraph Num Exceeded at paragraph number {i}."
 
                     # convert paragraph into filtered array of contextual word vecs
                     paragraphText = paragraph['context'].lower()

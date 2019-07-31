@@ -4,7 +4,12 @@ df = pd.read_csv('data/outData/squadDataBACKUP.sav')
 
 print(df)
 
-import questionAnswering.squadAnalysis
+from questionAnswering.squadAnalysis import read_squad_dataset
+
+read_squad_dataset(squadPath='data/inData/train-v2.0.json',
+                    paraDepth=2,
+                    picklePath='data/outData/squadDataFrame.sav',
+                    csvPath='data/outData/squadDataFrameBACKUP.csv')
 
 # from bert_serving.client import BertClient
 # from nltk.tokenize import word_tokenize
