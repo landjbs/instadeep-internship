@@ -109,7 +109,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     # save dataframe if prompted
     if picklePath:
         try:
-            dataframe.to_pickle(picklePath)
+            dataframe.to_pickle(picklePath, compression='gzip')
         except Exception as e:
             print(f'PICKLE ERROR: {e}')
     if csvPath:
