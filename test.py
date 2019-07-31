@@ -1,7 +1,7 @@
 # Read data
 from questionAnswering.squadAnalysis import read_squad_dataset
 df = read_squad_dataset(squadPath='data/inData/train-v2.0.json',
-                    paraDepth=10,
+                    paraDepth=16,
                     picklePath='data/outData/squadDataFrame.sav',
                     csvPath='data/outData/squadDataFrameBACKUP.csv')
 

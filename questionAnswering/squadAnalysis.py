@@ -19,6 +19,7 @@ def filter_text_vec(textVec, numWords):
     return np.array([wordVec for i, wordVec in enumerate(textVec)
                     if i <= numWords])
 
+
 def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
     """
     Makes a list of targets for training where answer tokens have score of
@@ -58,7 +59,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
         for categorty in tqdm(json.load(squadFile)['data']):
             # print(f"Category: {categorty['title']}")
 
-            for i, paragraph in enumerate(tqdm(categorty['paragraphs'], leave=False, ncols=120)):
+            for i, paragraph in enumerate(tqdm(categorty['paragraphs'], leave=False)):
                 try:
                     assert (i < paraDepth), f"Paragraph Num Exceeded at paragraph number {i}."
 
@@ -71,7 +72,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                     paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
                     paragraphArray = filter_text_vec(paragraphVec, paraMax)
 
-                    for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
+                    for qas in paragraph['qas']:
                         try:
                             # convert question into filtered array of conxtual word vecs
                             question = qas['question'].lower()
