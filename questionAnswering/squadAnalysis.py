@@ -77,5 +77,11 @@ with open('data/inData/train-v2.0.json') as squadFile:
                 pass
 
 dataframe = pd.DataFrame(dataList)
-
-dataframe.to_pickle('data/outData/squadDataFrame.sav')
+try:
+    dataframe.to_pickle('data/outData/squadDataFrame.sav')
+except Exception as e:
+    print(f'PICKLE: {e}')
+try:
+    dataframe.to_csv('data/outData/squadDataBACKUP.sav')
+except Exception as e:
+    print(f'CSV: {e}')
