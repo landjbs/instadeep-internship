@@ -4,7 +4,7 @@ import tensorflow as tf
 from functools import reduce
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, Bidirectional
+from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
 
 
 def train_answering_lstm(filePath, outPath=None):
@@ -15,25 +15,20 @@ def train_answering_lstm(filePath, outPath=None):
         -outPath:       Path to which to save the trained model
     """
 
+    # read and split the dataframe
     dataframe = pd.read_pickle(filePath)
-
     features, targets = dataframe['features'], dataframe['targets']
 
-    print(targets)
-
+    # reshape the feature and target arrays
     featureArray = np.array([feature for feature in features])
     targetArray = np.array([np.array(target) for target in targets])
 
-    for target in targets:
-        print(len(np.array(target)))
-
-    print(f'{"-"*80}\n{targetArray.shape}\n{"-"*80}')
-
+    # model architecture
     model = Sequential()
-    model.add(Bidirectional(LSTM(10, return_sequences=True),
+    model.add(Bidirectional(LSTM(400, return_sequences=True),
                                     input_shape=(featureArray.shape[1],
                                                 featureArray.shape[2])))
-    model.add(Bidirectional(LSTM(10)))
+    model.add(Bidirectional(LSTM(400)))
     model.add(Dense(5))
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
@@ -46,12 +41,12 @@ def train_answering_lstm(filePath, outPath=None):
     # model.add(Bidirectional(forward_layer, backward_layer=backward_layer,
     #                        input_shape=(5, 10)))
 
-    model.add(Dense(402))
+    model.add(Dense(targetArray.shape[1]))
     model.add(Activation('softmax'))
     model.compile(loss='binary_crossentropy', optimizer='rmsprop')
 
+    # model training
     model.fit(featureArray, targetArray)
-
 
     if outPath:
         model.save(outPath)
