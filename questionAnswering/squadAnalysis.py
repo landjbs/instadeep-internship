@@ -94,10 +94,12 @@ def read_squad_dataset(squadPath, paraDepth=2, picklePath=None, csvPath=None):
 
     if outPath:
         try:
-            dataframe.to_pickle(outPath)
+            dataframe.to_pickle(picklePath)
         except Exception as e:
             print(f'PICKLE ERROR: {e}')
         try:
-            dataframe.to_csv('data/outData/squadDataBACKUP.sav')
+            dataframe.to_csv(csvPath)
         except Exception as e:
             print(f'CSV ERROR: {e}')
+
+    return dataframe
