@@ -7,6 +7,14 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Bidirectional
 
 
+def train_answering_lstm(filePath, outPath=None):
+    """
+    Trains bidirectional LSTM model on dataframe of feature arrays and
+    target vectors in dataframe pickled at filePath.
+        -filePath:      Path at which the dataframe is pickled
+        -outPath:       Path to which to save the trained model
+    """
+
 df = pd.read_pickle('data/outData/squadDataFrame.sav')
 
 features, targets = df['features'], df['targets']
