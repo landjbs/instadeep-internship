@@ -25,6 +25,8 @@ def train_answering_lstm(filePath, outPath=None):
     targetArray = np.array([np.array(target) for target in targets])
 
     # plt.plot(np.sum(targetArray, axis=0))
+    # plt.xlabel('Token Num')
+    # plt.ylabel('Number of Times in Span')
     # plt.show()
 
     # model architecture
