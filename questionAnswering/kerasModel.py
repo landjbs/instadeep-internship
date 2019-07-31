@@ -37,7 +37,6 @@ def train_answering_lstm(filePath, outPath=None):
     model.add(Bidirectional(LSTM(40)))
     model.add(Dense(5))
     model.add(Activation('softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 
     # # With custom backward layer
     # model = Sequential()

@@ -53,6 +53,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
 
     dataList = []
     with open(squadPath) as squadFile:
+        print(f"{'-'*80}[ Analyzing SQuAD Dataset ]{'-'*80}")
         for categorty in tqdm(json.load(squadFile)['data']):
             # print(f"Category: {categorty['title']}")
 
