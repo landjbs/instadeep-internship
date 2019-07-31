@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
 
 
-def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
+def train_answering_lstm(filePath=None, outPath=None):
     """
     Trains bidirectional LSTM model on dataframe of feature arrays and
     target vectors in dataframe pickled at filePath.
@@ -17,8 +17,8 @@ def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
     """
 
     # read and split the dataframe
-    if (dataframe == None):
-        dataframe = pd.read_pickle(filePath, compression='gzip')
+    # if (dataframe == None):
+    dataframe = pd.read_pickle(filePath, compression='gzip')
 
     features, targets = dataframe['features'], dataframe['targets']
 
@@ -26,6 +26,7 @@ def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
     featureArray = np.array([feature for feature in features])
     targetArray = np.array([np.array(target) for target in targets])
 
+    ## Display
     # plt.plot(np.sum(targetArray, axis=0))
     # plt.xlabel('Token Num')
     # plt.ylabel('Number of Times in Span')
@@ -35,11 +36,11 @@ def train_answering_lstm(dataframe=None, filePath=None, outPath=None):
 
     # model architecture
     model = Sequential()
-    model.add(Bidirectional(LSTM(40, return_sequences=True),
+    model.add(Bidirectional(LSTM(400, return_sequences=True),
                                 input_shape=(featureArray.shape[1],
                                             featureArray.shape[2])))
-    model.add(Bidirectional(LSTM(40)))
-    model.add(Dense(5))
+    model.add(Bidirectional(LSTM(400)))
+    model.add(Dense(100))
     model.add(Activation('softmax'))
 
     # # With custom backward layer

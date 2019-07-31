@@ -1,20 +1,26 @@
+# Read data
 from questionAnswering.squadAnalysis import read_squad_dataset
-
 df = read_squad_dataset(squadPath='data/inData/train-v2.0.json',
-                    paraDepth=1,
+                    paraDepth=10,
                     picklePath='data/outData/squadDataFrame.sav',
                     csvPath='data/outData/squadDataFrameBACKUP.csv')
 
+# Train model
+from questionAnswering.kerasModel import train_answering_lstm
+model = train_answering_lstm(filePath='data/outData/squadDataFrame.sav',
+                            outPath='data/outData/models/answeringModel.sav')
+
+
+# Test model
 import numpy as np
 from bert_serving.client import BertClient
+from keras.models import load_model
 from nltk.tokenize import word_tokenize, sent_tokenize
-
-from questionAnswering.kerasModel import train_answering_lstm
+from scipy.special import softmax
 
 bc = BertClient()
 
-model = train_answering_lstm(dataframe=df,
-                            outPath='data/outData/models/answeringModel.sav')
+model = load_model('data/outData/models/answeringModel.sav')
 
 
 def filter_text_vec(textVec, numWords):
@@ -25,6 +31,7 @@ def filter_text_vec(textVec, numWords):
     """
     return np.array([wordVec for i, wordVec in enumerate(textVec)
                     if i <= numWords])
+
 
 context = """
 A good article (GA) is an article that meets a core set of editorial standards but is not featured article quality.
@@ -49,10 +56,13 @@ while True:
     questionArray = filter_text_vec(questionVec, 12)
     featureArray = np.concatenate([questionArray, contextArray], axis=0)
     print(f'Shape: {featureArray.shape}')
-    predictions = model.predict(featureArray)
-    print(f'Predicitons: {predictions}')
-    plt.plot(predictions)
-    plt.show()
-    maxTokenLoc = predictions.index(max(predictions))
-    actualLoc = maxTokenLoc - (len(questionArray)) - 1
-    print(contextTokens[actualLoc])
+    expandedFeatures = np.expand_dims(featureArray, axis=0)
+    print(expandedFeatures.shape)
+    predictions = [elt for elt in model.predict(expandedFeatures)[0]]
+    maxPredictionLoc = predictions.index(max(predictions))
+    actualMaxLoc = maxPredictionLoc - (questionArray.shape[0]) - 1
+    print(actualMaxLoc)
+    print(contextTokens[actualMaxLoc])
+    # print(predictions)
+    # plt.plot(predictions)
+    # plt.show()
