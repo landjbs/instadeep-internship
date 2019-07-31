@@ -1,14 +1,19 @@
-class KerasBatchGenerator(object):
+def load_data():
+    # get the data paths
+    train_path = os.path.join(data_path, "ptb.train.txt")
+    valid_path = os.path.join(data_path, "ptb.valid.txt")
+    test_path = os.path.join(data_path, "ptb.test.txt")
 
-    def __init__(self, data, num_steps, batch_size, vocabulary, skip_step=5):
-        self.data = data
-        self.num_steps = num_steps
-        self.batch_size = batch_size
-        self.vocabulary = vocabulary
-        # this will track the progress of the batches sequentially through the
-        # data set - once the data reaches the end of the data set it will reset
-        # back to zero
-        self.current_idx = 0
-        # skip_step is the number of words which will be skipped before the next
-        # batch is skimmed from the data set
-        self.skip_step = skip_step
+    # build the complete vocabulary, then convert text data to list of integers
+    word_to_id = build_vocab(train_path)
+    train_data = file_to_word_ids(train_path, word_to_id)
+    valid_data = file_to_word_ids(valid_path, word_to_id)
+    test_data = file_to_word_ids(test_path, word_to_id)
+    vocabulary = len(word_to_id)
+    reversed_dictionary = dict(zip(word_to_id.values(), word_to_id.keys()))
+
+    print(train_data[:5])
+    print(word_to_id)
+    print(vocabulary)
+    print(" ".join([reversed_dictionary[x] for x in train_data[:10]]))
+    return train_data, valid_data, test_data, vocabulary, reversed_dictionary

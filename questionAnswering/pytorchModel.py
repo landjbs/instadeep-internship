@@ -22,6 +22,7 @@ training_data = []
 for dataPoint in raw_data:
     sentence = dataPoint[0]
     sentenceVec = [num for num in bc.encode([sentence])[0][1]]
+    print([sentenceVec])
     training_data.append((torch.tensor(sentenceVec), dataPoint[1]))
 
 
@@ -40,10 +41,9 @@ class LSTMTagger(nn.Module):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
 
-        self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+        # self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
 
         # print(self.word_embeddings)
-
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
         self.lstm = nn.LSTM(embedding_dim, hidden_dim)
@@ -52,8 +52,7 @@ class LSTMTagger(nn.Module):
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
 
     def forward(self, sentence):
-        embeds = self.word_embeddings(sentence)
-        lstm_out, _ = self.lstm(embeds.view(len(sentence), 1, -1))
+        lstm_out, _ = self.lstm((len(sentence), 1, -1))
         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
         tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
