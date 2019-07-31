@@ -53,4 +53,6 @@ while True:
     print(f'Predicitons: {predictions}')
     plt.plot(predictions)
     plt.show()
-    
+    maxTokenLoc = predictions.index(max(predictions))
+    actualLoc = maxTokenLoc - (len(questionArray)) - 1
+    print(contextTokens[actualLoc])
