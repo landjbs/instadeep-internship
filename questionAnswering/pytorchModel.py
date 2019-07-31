@@ -59,6 +59,11 @@ class LSTMTagger(nn.Module):
 
         self.linear = nn.Linear(self.hidden_dim, output_dim)
 
+    def init_hidden(self):
+        # This is what we'll initialise our hidden state as
+        return (torch.zeros(self.num_layers, self.batch_size, self.hidden_dim),
+                torch.zeros(self.num_layers, self.batch_size, self.hidden_dim))
+
     def forward(self, sentence):
         lstm_out, _ = self.lstm((len(sentence), 1, -1))
         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
