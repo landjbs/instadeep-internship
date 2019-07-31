@@ -38,9 +38,7 @@ def get_word_encodings(text, maxLen=35):
     """
     # split by sentence and assert length
     sentences = sent_tokenize(text)
-    print(sentences)
     tokenizedSentences = [word_tokenize(sentence) for sentence in sentences]
-    print(tokenizedSentences)
     # encode sentences
     sentenceVecs = bc.encode(tokenizedSentences, is_tokenized=True)
     # build and return list of contextual word embeddings

@@ -9,7 +9,7 @@ from bert_serving.client import BertClient
 
 bc = BertClient(check_length=True)
 
-MAX_LEN = 490
+MAX_LEN = 390
 
 def filter_text_vec(textVec):
     """
@@ -41,18 +41,20 @@ with open('data/inData/train-v2.0.json') as squadFile:
     for categorty in json.load(squadFile)['data']:
         print(f"Category: {categorty['title']}")
 
-        for paragraph in categorty['paragraphs']:
+        for i, paragraph in enumerate(tqdm(categorty['paragraphs'])):
             try:
+                assert (i<2), f"Paragraph Num Exceeded at paragraph number {i}."
+
                 # convert paragraph into filtered array of contextual word vecs
                 paragraphText = paragraph['context'].lower()
                 paragraphTokens = word_tokenize(paragraphText)
 
-                assert (len(paragraphTokens)>=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens— cannot be more than {MAX_LEN}."
+                assert (len(paragraphTokens)<=MAX_LEN), f"Paragraph has {len(paragraphTokens)} tokens; cannot be more than {MAX_LEN}."
 
                 paragraphVec = bc.encode([paragraphTokens], is_tokenized=True)[0]
                 paragraphArray = filter_text_vec(paragraphVec)
 
-                for qas in paragraph['qas']:
+                for qas in tqdm(paragraph['qas'], leave=False, ncols=70):
                     # convert question into filtered array of conxtual word vecs
                     question = qas['question'].lower()
                     questionTokens = word_tokenize(question)
