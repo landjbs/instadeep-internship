@@ -34,25 +34,28 @@ def build_question_database(path, n, outPath=None):
                         questionText    =   questionDict['question_text']
                         questionVec     =   vectorize_doc(questionText)
 
-                        print(f"-{questionText}")
-
-                        # get list of start locations for each long answer candidate
-                        answerInfo      =   questionDict['annotations'][0]
-                        shortAnswerInfo =   answerInfo['short_answers']
-                        pageTokens      =   questionDict['document_tokens']
-
-
-                        if not (shortAnswerInfo==[]):
-                            shortStart  =   shortAnswerInfo[0]['start_token']
-                            shortEnd    =   shortAnswerInfo[0]['end_token']
-                            answerWords =   " ".join(tokenDict['token']
-                                                for tokenDict in pageTokens[shortStart:shortEnd])
-                            print(answerWords)
-                        else:
-                            print('non')
+                        # print(f"-{questionText}")
+                        #
+                        # # get list of start locations for each long answer candidate
+                        # answerInfo      =   questionDict['annotations'][0]
+                        # shortAnswerInfo =   answerInfo['short_answers']
+                        # pageTokens      =   questionDict['document_tokens']
+                        #
+                        #
+                        # if not (shortAnswerInfo==[]):
+                        #     shortStart  =   shortAnswerInfo[0]['start_token']
+                        #     shortEnd    =   shortAnswerInfo[0]['end_token']
+                        #     answerWords =   " ".join(tokenDict['token']
+                        #                         for tokenDict in pageTokens[shortStart:shortEnd])
+                        #     print(answerWords)
+                        # else:
+                        #     print('non')
 
                         # pageText = " ".join(tokenDict['token'] for tokenDict in )
 
+                        curColumnDict = {'query':questionText,
+                                        'vec':questionVec,
+                                        'score':1}
 
                         fileData.append(curColumnDict)
 
@@ -67,7 +70,7 @@ def build_question_database(path, n, outPath=None):
     infoList = reduce(fold_info_list, listdir(path), [])
     # convert list to dataframe
     dataframe = pd.DataFrame(infoList)
-    print(dataframe)
+    print(dataframe.head())
     # save to outPath if give
     if outPath:
         dataframe.to_pickle(outPath)

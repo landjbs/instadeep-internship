@@ -21,8 +21,9 @@ def train_answering_lstm(folderPath, outPath=None):
     # build dataframe form tablets under folderPath
     tabletList = []
     for file in listdir(folderPath):
-        tablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
-        tabletList.append(tablet)
+        if file.endswith('.sav'):
+            tablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
+            tabletList.append(tablet)
 
     dataframe = pd.concat(tabletList)
 
@@ -32,20 +33,21 @@ def train_answering_lstm(folderPath, outPath=None):
     featureArray = np.array([feature for feature in features])
     targetArray = np.array([np.array(target) for target in targets])
 
-    ## Display
+    # # Display
     # plt.plot(np.sum(targetArray, axis=0))
     # plt.xlabel('Token Num')
     # plt.ylabel('Number of Times in Span')
     # plt.show()
 
-    print(featureArray.shape)
+
+    maskArray = np.zeros(featureArray.shape[2])
+    print(f'Mask: {maskArray.shape}')
 
     # model architecture
     model = Sequential()
-    model.add(Masking(mask_value=0))
-    model.add(Bidirectional(LSTM(40), # return_sequences=True
-                                input_shape=(featureArray.shape[1],
-                                            featureArray.shape[2])))
+    model.add(Masking(mask_value=maskArray))
+    model.add(Bidirectional(LSTM(40), input_shape=(featureArray.shape[1],
+                                                featureArray.shape[2])))
     # model.add(Bidirectional(LSTM(400)))
 
     # # With custom backward layer
@@ -60,12 +62,21 @@ def train_answering_lstm(folderPath, outPath=None):
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
+    from keras.utils import plot_model
+    plot_model(model, to_file='model.png')
+
     # model training
-    model.fit(featureArray, targetArray, batch_size=10, epochs=10)
+    model.fit(featureArray, targetArray, batch_size=200, epochs=50)
 
     if outPath:
         model.save(outPath)
 
-    plot_model(model, to_file='model.png')
+    plt.plot(history.history['acc'])
+    # plt.plot(history.history['val_acc'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    # plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
 
     return model

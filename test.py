@@ -1,8 +1,8 @@
 # Read data
-from questionAnswering.squadAnalysis import read_squad_dataset
-read_squad_dataset(squadPath='data/inData/train-v2.0.json',
-                    paraDepth=2,
-                    pickleFolder='data/outData/squadDataFrames',)
+# from questionAnswering.squadAnalysis import read_squad_dataset
+# read_squad_dataset(squadPath='data/inData/train-v2.0.json',
+#                     paraDepth=2,
+#                     pickleFolder='data/outData/squadDataFrames',)
 
 # Train model
 from questionAnswering.kerasModel import train_answering_lstm
@@ -33,13 +33,7 @@ def filter_text_vec(textVec, numWords):
 
 
 context = """
-A good article (GA) is an article that meets a core set of editorial standards but is not featured article quality.
-Good articles meet the good article criteria, passing through the good article nomination process successfully.
-They are well written, contain factually accurate and verifiable information, are broad in coverage, neutral in point of view, stable,
-and illustrated, where possible, by relevant images with suitable copyright licenses.
-Good articles do not have to be as comprehensive as featured articles, but they should not omit any major facets of the topic:
-a comparison of the criteria for good and featured articles describes further differences.
-"""
+Beyoncé Giselle Knowles-Carter (/biːˈjɒnseɪ/; born September 4, 1981)[4] is an American singer, actress, songwriter, record producer, director, model, dancer, fashion designer and businesswoman. Born and raised in Houston, Texas, Beyoncé performed in various singing and dancing competitions as a child. She rose to fame in the late 1990s as lead singer of the R&B girl-group Destiny's Child. Managed by her father, Mathew Knowles, the group became one of the best-selling girl groups in history. Their hiatus saw Beyoncé's theatrical film debut in Austin Powers in Goldmember (2002) and the release of her first solo album, Dangerously in Love (2003). The album established her as a solo artist worldwide, debuting at number one on the US Billboard 200 chart and earning her five Grammy Awards.[5] The album also featured the US Billboard Hot 100 number-one singles "Crazy in Love" and "Baby Boy"."""
 
 contextTokens = word_tokenize(context)
 contextVec = bc.encode([contextTokens], is_tokenized=True)[0]
@@ -57,11 +51,21 @@ while True:
     print(f'Shape: {featureArray.shape}')
     expandedFeatures = np.expand_dims(featureArray, axis=0)
     print(expandedFeatures.shape)
-    predictions = [elt for elt in model.predict(expandedFeatures)[0]]
-    maxPredictionLoc = predictions.index(max(predictions))
-    actualMaxLoc = maxPredictionLoc - (questionArray.shape[0]) - 1
-    print(actualMaxLoc)
-    print(contextTokens[actualMaxLoc])
-    print(predictions)
-    plt.plot(predictions)
-    plt.show()
+    predictions = [(p, (i - (questionArray.shape[0]) - 1)) for i, p in enumerate(model.predict(expandedFeatures)[0])]
+
+    predictions.sort(reverse=True)
+
+    maxLocs = [elt[1] for elt in predictions[:10]]
+    print(maxLocs)
+
+    for predLoc in maxLocs:
+        print(contextTokens[predLoc])
+
+    # maxPredictionLoc = predictions.index(max(predictions))
+    # actualMaxLoc = maxPredictionLoc -
+    # print(actualMaxLoc)
+    # print(contextTokens[actualMaxLoc])
+    # print(predictions)
+
+    # plt.plot(predictions)
+    # plt.show()
