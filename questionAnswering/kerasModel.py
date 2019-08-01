@@ -46,12 +46,11 @@ def train_answering_lstm(folderPath, outPath=None):
     # model architecture
     model = Sequential()
     model.add(Masking(mask_value=maskArray))
-    model.add(Bidirectional(LSTM(40), input_shape=(featureArray.shape[1],
+    model.add(Bidirectional(LSTM(400), input_shape=(featureArray.shape[1],
                                                 featureArray.shape[2])))
     # model.add(Bidirectional(LSTM(400)))
 
     # # With custom backward layer
-    # model = Sequential()
     # forward_layer = LSTM(10, return_sequences=True)
     # backard_layer = LSTM(10, activation='relu', return_sequences=True,
     #                     go_backwards=True)
@@ -62,21 +61,18 @@ def train_answering_lstm(folderPath, outPath=None):
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
-    from keras.utils import plot_model
-    plot_model(model, to_file='model.png')
-
     # model training
-    model.fit(featureArray, targetArray, batch_size=200, epochs=50)
+    model.fit(x_train, y_train, batch_size=200, epochs=50, validation_split=0.1)
 
     if outPath:
         model.save(outPath)
 
     plt.plot(history.history['acc'])
-    # plt.plot(history.history['val_acc'])
+    plt.plot(history.history['val_acc'])
     plt.title('Model accuracy')
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
-    # plt.legend(['Train', 'Test'], loc='upper left')
+    plt.legend(['Train', 'Test'], loc='upper left')
     plt.show()
 
     return model

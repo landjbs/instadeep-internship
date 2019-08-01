@@ -1,12 +1,6 @@
-# from vectorizers.datasetVectorizer import vectorize_folderList
-# folderList = ['data/inData/imdbData/train/pos', 'data/inData/imdbData/train/neg']
-# vectorize_folderList(folderList, numFiles=5000, outPath='data/outData/imdbTrain5000.sav')
+from questionAnswering.questionFormat import create_fake_queries
+from questionAnswering.questionAnalysis import build_question_database
 
-# from supervised.folderPrediction import train_folder_model
-# train_folder_model('data/outData/imdbTrain5000.sav', outPath='data/outData/models/folderModel5000.sav')
+fakeDf = create_fake_queries(6215, outPath='data/outData/fakeQueryDf'))
 
-from supervised.sentimentAnalyzer import analyze_text
-
-while True:
-    text = input('test: ')
-    analyze_text(text)
+realDf = build_question_database()

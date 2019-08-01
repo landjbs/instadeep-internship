@@ -51,6 +51,3 @@ def create_fake_queries(queryNum, queryLen=5, outPath=None):
         queryDf.to_pickle(outPath)
 
     return queryDf
-
-
-fakeQueryDf = scramble_fake_queries(6215)
