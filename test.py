@@ -1,8 +1,8 @@
-# # Read data
-# from questionAnswering.squadAnalysis import read_squad_dataset
-# read_squad_dataset(squadPath='data/inData/train-v2.0.json',
-#                     paraDepth=1,
-#                     pickleFolder='data/outData/squadDataFrames',)
+# Read data
+from questionAnswering.squadAnalysis import read_squad_dataset
+read_squad_dataset(squadPath='data/inData/train-v2.0.json',
+                    paraDepth=2,
+                    pickleFolder='data/outData/squadDataFrames',)
 
 # Train model
 from questionAnswering.kerasModel import train_answering_lstm
@@ -62,6 +62,6 @@ while True:
     actualMaxLoc = maxPredictionLoc - (questionArray.shape[0]) - 1
     print(actualMaxLoc)
     print(contextTokens[actualMaxLoc])
-    # print(predictions)
-    # plt.plot(predictions)
-    # plt.show()
+    print(predictions)
+    plt.plot(predictions)
+    plt.show()

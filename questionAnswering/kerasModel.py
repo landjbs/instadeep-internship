@@ -17,14 +17,13 @@ def train_answering_lstm(folderPath, outPath=None):
         -outPath:       Path to which to save the trained model
     """
 
+    # build dataframe form tablets under folderPath
     tabletList = []
-    # read and split the dataframe
     for file in listdir(folderPath):
         tablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
         tabletList.append(tablet)
 
     dataframe = pd.concat(tabletList)
-    print(dataframe.shape)
 
     features, targets = dataframe['features'], dataframe['targets']
 
@@ -42,12 +41,10 @@ def train_answering_lstm(folderPath, outPath=None):
 
     # model architecture
     model = Sequential()
-    model.add(Bidirectional(LSTM(400, return_sequences=True),
+    model.add(Bidirectional(LSTM(40), # return_sequences=True
                                 input_shape=(featureArray.shape[1],
                                             featureArray.shape[2])))
-    model.add(Bidirectional(LSTM(400)))
-    model.add(Dense(100))
-    model.add(Activation('softmax'))
+    # model.add(Bidirectional(LSTM(400)))
 
     # # With custom backward layer
     # model = Sequential()
@@ -59,10 +56,10 @@ def train_answering_lstm(folderPath, outPath=None):
 
     model.add(Dense(targetArray.shape[1]))
     model.add(Activation('softmax'))
-    model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
     # model training
-    model.fit(featureArray, targetArray, epochs=10)
+    model.fit(featureArray, targetArray, batch_size=10, epochs=10)
 
     if outPath:
         model.save(outPath)
