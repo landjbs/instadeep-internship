@@ -77,6 +77,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                             # convert question into filtered array of conxtual word vecs
                             question = qas['question'].lower()
                             questionTokens = word_tokenize(question)
+                            questionId = qas['id']
 
                             assert (len(questionTokens)<=questionMax), f"Question has {len(questionTokens)} tokens; cannot be more than {questionMax}."
 
@@ -97,7 +98,9 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
 
                             featureArray = np.concatenate([questionArray, paragraphArray], axis=0)
 
-                            dataList.append({'features':featureArray, 'targets':targetList})
+                            dataList.append({'id': questionId,
+                                            'features':featureArray,
+                                            'targets':targetList})
                         except:
                             pass
                 except:
