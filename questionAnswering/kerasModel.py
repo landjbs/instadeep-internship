@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from os import listdir
 from functools import reduce
 import matplotlib.pyplot as plt
 
@@ -8,17 +9,17 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
 
 
-def train_answering_lstm(filePath=None, outPath=None):
+def train_answering_lstm(folderPath, outPath=None):
     """
     Trains bidirectional LSTM model on dataframe of feature arrays and
     target vectors in dataframe pickled at filePath.
-        -filePath:      Path at which the dataframe is pickled
+        -folderPath:    Path to folder under which the dataframe is tableted
         -outPath:       Path to which to save the trained model
     """
 
     # read and split the dataframe
-    # if (dataframe == None):
-    dataframe = pd.read_pickle(filePath, compression='gzip')
+    for file in listdir(folderPath):
+        dataframeTablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
 
     features, targets = dataframe['features'], dataframe['targets']
 
