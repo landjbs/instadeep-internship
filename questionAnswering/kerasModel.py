@@ -6,7 +6,8 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D
+from keras.layers import Dense, Activation, LSTM, Bidirectional, ConvLSTM2D, Masking
+from keras.utils import plot_model
 
 
 def train_answering_lstm(folderPath, outPath=None):
@@ -41,6 +42,7 @@ def train_answering_lstm(folderPath, outPath=None):
 
     # model architecture
     model = Sequential()
+    model.add(Masking(mask_value=0))
     model.add(Bidirectional(LSTM(40), # return_sequences=True
                                 input_shape=(featureArray.shape[1],
                                             featureArray.shape[2])))
@@ -63,5 +65,7 @@ def train_answering_lstm(folderPath, outPath=None):
 
     if outPath:
         model.save(outPath)
+
+    plot_model(model, to_file='model.png')
 
     return model
