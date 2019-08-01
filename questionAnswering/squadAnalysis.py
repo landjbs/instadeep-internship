@@ -37,7 +37,7 @@ def make_target_list(answerTokens, paragraphTokens, questionLen, paraLen):
     return ([0 for _ in range(questionLen)] + paragraphTargets)
 
 
-def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, picklePath=None, csvPath=None):
+def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pickleFolder=None):
     """
     Reads SQuAD dataset from json file into LSTM-ready dataframe mapping a
     feature array of the contextual embedding of each token in a text with
@@ -48,15 +48,16 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
         -paraDepth:     Number of questions from each paragraph to analyze
         -paraMax:       Max number of tokens that a paragraph can have to be analyzed
         -questionMax:   Max number of tokens that a question can have to be analyzed
-        -picklePath:    Path to which to save the final dataframe as pickle
-        -csvPath:       Path to which to save the final dataframe as csv (backup)
+        -pickleFolder:  Folder underwhich to pickle the tableted dataframe
     """
 
     dataList = []
     with open(squadPath) as squadFile:
         print(f"{'-'*30}[ Analyzing SQuAD Dataset ]{'-'*30}")
 
-        for categorty in tqdm(json.load(squadFile)['data']):
+        for nz, categorty in enumerate(tqdm(json.load(squadFile)['data'])):
+            if nz > 2:
+                break
             # print(f"Category: {categorty['title']}")
 
             for i, paragraph in enumerate(tqdm(categorty['paragraphs'], leave=False)):
@@ -77,6 +78,8 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                             # convert question into filtered array of conxtual word vecs
                             question = qas['question'].lower()
                             questionTokens = word_tokenize(question)
+
+                            # get question id
                             questionId = qas['id']
 
                             assert (len(questionTokens)<=questionMax), f"Question has {len(questionTokens)} tokens; cannot be more than {questionMax}."
@@ -94,7 +97,8 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                                                             questionArray.shape[0],
                                                             paragraphArray.shape[0])
                             else:
-                                targetList = [0 for _ in range(questionArray.shape[0] + paragraphArray.shape[0])]
+                                targetList = [0 for _ in range(questionArray.shape[0]
+                                                            + paragraphArray.shape[0])]
 
                             featureArray = np.concatenate([questionArray, paragraphArray], axis=0)
 
@@ -107,19 +111,24 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
                     pass
     print('-'*87)
 
-    dataframe = pd.DataFrame(dataList)
+    # find the proper number of chunks into which to break the dataframe
+    dataLen = len(dataList)
+    for i in range(1, 15):
+        if (((dataLen / i) % 1) == 0):
+            chunkNum = i
 
-    # save dataframe if prompted
-    if picklePath:
-        try:
-            dataframe.to_pickle(picklePath, compression='gzip')
-            print(f'Pickled to "{picklePath}"')
-        except Exception as e:
-            print(f'PICKLE ERROR: {e}')
-    if csvPath:
-        try:
-            dataframe.to_csv(csvPath)
-        except Exception as e:
-            print(f'CSV ERROR: {e}')
+    chunkSize = int(dataLen / chunkNum)
 
-    return dataframe
+    # save dataframe
+    try:
+        for dataIndex in range(0, dataLen, chunkSize):
+            dataframe = pd.DataFrame(dataList[dataIndex : (dataIndex+chunkSize)])
+            dataframe.to_pickle(f'{pickleFolder}/dataframe{i}.sav', compression='gzip')
+            print(f'Pickled to "{pickleFolder}/dataframe{i}.sav"')
+            del dataframe
+
+    except Exception as e:
+        print(f'PICKLE ERROR: {e}')
+
+
+    return True
