@@ -17,9 +17,14 @@ def train_answering_lstm(folderPath, outPath=None):
         -outPath:       Path to which to save the trained model
     """
 
+    tabletList = []
     # read and split the dataframe
     for file in listdir(folderPath):
-        dataframeTablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
+        tablet = pd.read_pickle(f'{folderPath}/{file}', compression='gzip')
+        tabletList.append(tablet)
+
+    dataframe = pd.concat(tabletList)
+    print(dataframe.head())
 
     features, targets = dataframe['features'], dataframe['targets']
 
