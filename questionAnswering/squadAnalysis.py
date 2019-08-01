@@ -109,11 +109,12 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
 
     # find the proper number of chunks into which to break the dataframe
     dataLen = len(dataList)
-    for i in range(1, 15):
+    for i in range(1, 40):
         if (((dataLen / i) % 1) == 0):
             chunkNum = i
 
     chunkSize = int(dataLen / chunkNum)
+    print(f'chunkSize: {chunkSize}')
 
     # save dataframe
     try:
