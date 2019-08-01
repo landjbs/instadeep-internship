@@ -123,8 +123,9 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     try:
         for dataIndex in range(0, dataLen, chunkSize):
             dataframe = pd.DataFrame(dataList[dataIndex : (dataIndex+chunkSize)])
-            dataframe.to_pickle(f'{pickleFolder}/dataframe{i}.sav', compression='gzip')
-            print(f'Pickled to "{pickleFolder}/dataframe{i}.sav"')
+            dataframe.to_pickle(f'{pickleFolder}/dataframe{dataIndex}.sav',
+                                compression='gzip')
+            print(f'Pickled to "{pickleFolder}/dataframe{dataIndex}.sav"')
             del dataframe
 
     except Exception as e:

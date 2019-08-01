@@ -24,7 +24,7 @@ def train_answering_lstm(folderPath, outPath=None):
         tabletList.append(tablet)
 
     dataframe = pd.concat(tabletList)
-    print(dataframe.head())
+    print(dataframe.shape)
 
     features, targets = dataframe['features'], dataframe['targets']
 
