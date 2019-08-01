@@ -55,11 +55,7 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     with open(squadPath) as squadFile:
         print(f"{'-'*30}[ Analyzing SQuAD Dataset ]{'-'*30}")
 
-        for nz, categorty in enumerate(tqdm(json.load(squadFile)['data'])):
-            # if nz > 2:
-            #     break
-            # print(f"Category: {categorty['title']}")
-
+        for categorty in tqdm(json.load(squadFile)['data']):
             for i, paragraph in enumerate(tqdm(categorty['paragraphs'], leave=False)):
                 try:
                     assert (i < paraDepth), f"Paragraph Num Exceeded at paragraph number {i}."
@@ -131,5 +127,6 @@ def read_squad_dataset(squadPath, paraDepth=2, paraMax=390, questionMax=12, pick
     except Exception as e:
         print(f'PICKLE ERROR: {e}')
 
+    del dataList
 
     return True

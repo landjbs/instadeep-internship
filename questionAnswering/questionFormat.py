@@ -6,11 +6,10 @@ question query (eg. is boogle the best?)
 
 import numpy as np
 import pandas as pd
+from utils.objectSaver import load
+from vectorizers.docVecs import vectorize_doc
 
-from dataStructures.objectSaver import load, save
-from models.binning.docVecs import vectorize_doc
-
-freqDict = load('data/outData/knowledge/freqDict.sav')
+freqDict = load('data/inData/freqDict.sav')
 
 def create_fake_queries(queryNum, queryLen=5, outPath=None):
     """
