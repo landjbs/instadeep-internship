@@ -52,8 +52,8 @@ def train_answering_lstm(folderPath, outPath=None):
     from keras_self_attention import SeqSelfAttention
 
     inputs = keras.layers.Input(shape=[404, 768], name='encodings')
-    lstm_out = keras.layers.Bidirectional(keras.layers.LSTM(units=128, return_sequences=True))(inputs)
-    attn = SeqSelfAttention(attention_activation='relu')(lstm_out)
+    lstm_out = keras.layers.Bidirectional(keras.layers.LSTM(units=80, return_sequences=True))(inputs)
+    # attn = SeqSelfAttention(attention_activation='relu')(lstm_out)
     output = keras.layers.Dense(units=1, activation='softmax')(attn)
     output = keras.layers.Reshape([404])(output)
 
@@ -72,8 +72,9 @@ def train_answering_lstm(folderPath, outPath=None):
     # model.compile(loss='categorical_crossentropy',
     #                 optimizer='adam',
     #                 metrics=['accuracy'])
-    # # model training
-    model.fit(featureArray, targetArray, batch_size=256,
+
+    # model training
+    model.fit(featureArray, targetArray, batch_size=20,
                 epochs=50, validation_split=0.1)
 
     if outPath:
