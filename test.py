@@ -4,10 +4,14 @@
 #                     paraDepth=12,
 #                     pickleFolder='data/outData/squadDataFrames',)
 
+import questionAnswering.questionFormatModel
+
+print('done')
+
 # Train model
-from questionAnswering.kerasModel import train_answering_lstm
-model = train_answering_lstm(folderPath='data/outData/squadDataFrames',
-                            outPath='data/outData/models/answeringModel.sav')
+# from questionAnswering.kerasModel import train_answering_lstm
+# model = train_answering_lstm(folderPath='data/outData/squadDataFrames',
+#                             outPath='data/outData/models/answeringModel.sav')
 
 
 # # Test model
