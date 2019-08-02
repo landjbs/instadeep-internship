@@ -1,8 +1,8 @@
 # Read data
-from questionAnswering.squadAnalysis import read_squad_dataset
-read_squad_dataset(squadPath='data/inData/train-v2.0.json',
-                    paraDepth=12,
-                    pickleFolder='data/outData/squadDataFrames',)
+# from questionAnswering.squadAnalysis import read_squad_dataset
+# read_squad_dataset(squadPath='data/inData/train-v2.0.json',
+#                     paraDepth=12,
+#                     pickleFolder='data/outData/squadDataFrames',)
 
 # Train model
 from questionAnswering.kerasModel import train_answering_lstm

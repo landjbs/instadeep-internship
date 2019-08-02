@@ -29,9 +29,14 @@ def train_answering_lstm(folderPath, outPath=None):
 
     features, targets = dataframe['features'], dataframe['targets']
 
+    del dataframe
+
     # reshape the feature and target arrays
     featureArray = np.array([feature for feature in features])
     targetArray = np.array([np.array(target) for target in targets])
+
+    del features
+    del targets
 
     # # Display
     # plt.plot(np.sum(targetArray, axis=0))
@@ -42,12 +47,11 @@ def train_answering_lstm(folderPath, outPath=None):
     print(featureArray)
 
     maskArray = np.zeros(featureArray.shape[2])
-    print(f'Mask: {maskArray.shape}')
 
     # model architecture
     model = Sequential()
     # model.add(Masking(mask_value=maskArray))
-    model.add(Bidirectional(GRU(40), input_shape=(featureArray.shape[1],
+    model.add(Bidirectional(LSTM(40), input_shape=(featureArray.shape[1],
                                                 featureArray.shape[2])))
     # model.add(Bidirectional(LSTM(400)))
 
@@ -60,7 +64,7 @@ def train_answering_lstm(folderPath, outPath=None):
     model.add(Dense(targetArray.shape[1], activation='relu'))
     model.add(Activation('softmax'))
     # model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-    model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
     # model training
     model.fit(featureArray, targetArray, batch_size=200,
