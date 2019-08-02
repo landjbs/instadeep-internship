@@ -12,7 +12,7 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 # bert-serving-start -model_dir /Users/landonsmith/Desktop/uncased_L-24_H-1024_A-16 -num_worker=1
 # bert-serving-start -pooling_strategy NONE -model_dir /Users/landonsmith/Desktop/shortBert -num_worker=1 -mask_cls_sep -max_seq_len=20
 bc = BertClient(check_length=True)
-
+#test
 
 class VectorizationError(Exception):
     """ Class for errors during vectorization """
