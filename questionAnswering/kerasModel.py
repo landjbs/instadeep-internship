@@ -6,8 +6,8 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, GRU, Bidirectional, ConvLSTM2D, Masking, TimeDistributed, CuDNNGRU
-from keras.utils import plot_model
+from keras.layers import Dense,Reshape,Activation,LSTM, GRU, Bidirectional, ConvLSTM2D, Masking, TimeDistributed, CuDNNGRU
+from keras_self_attention import SeqSelfAttention
 
 
 def train_answering_lstm(folderPath, outPath=None):
@@ -48,20 +48,19 @@ def train_answering_lstm(folderPath, outPath=None):
 
     maskArray = np.zeros(featureArray.shape[2])
 
+    # alternative architecture
+
+
+
+
     # model architecture
     model = Sequential()
-    # model.add(Masking(mask_value=maskArray))
-    model.add(Bidirectional(LSTM(40), input_shape=(featureArray.shape[1],
-                                                featureArray.shape[2])))
-    # model.add(Bidirectional(LSTM(400)))
-
-    # forward_layer = LSTM(10, return_sequences=True)
-    # backard_layer = LSTM(10, activation='relu', return_sequences=True,
-    #                     go_backwards=True)
-    # model.add(Bidirectional(forward_layer, backward_layer=backward_layer,
-    #                        input_shape=(5, 10)))
-
-    model.add(Dense(targetArray.shape[1], activation='relu'))
+    model.add(Masking(mask_value=maskArray))
+    model.add(Bidirectional(LSTM(40, return_sequences=True),
+                                input_shape=(featureArray.shape[1],
+                                            featureArray.shape[2])))
+    model.add(Reshape([200, -1]))
+    model.add(Dense(targetArray.shape[1]))
     model.add(Activation('softmax'))
     # model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
@@ -74,13 +73,5 @@ def train_answering_lstm(folderPath, outPath=None):
         model.save(outPath)
 
     print(model.summary())
-
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('Model accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
 
     return model

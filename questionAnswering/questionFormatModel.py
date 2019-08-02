@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import h5py
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
@@ -62,4 +63,4 @@ model.compile(optimizer ='adam',loss='binary_crossentropy', metrics =['accuracy'
 
 model.fit(np.array(normedFeatures), targets, validation_split=0.1, epochs=15)
 
-model.save('data/outData/models/questionFormatModel.sav')
+model.save('data/outData/models/queryFormatModel.h5')
